@@ -53,7 +53,7 @@ include "app/controllers/users.php";
             <div class="w-100"></div>
             <div class="mb-3 col-12 col-md-4">
                 <button type="submit" name="button-log" class="btn btn-secondary">Войти</button>
-                <a href="aut.html">Зарегистрироваться</a>
+                <a href="<?= BASE_URL ?>reg.php">Зарегистрироваться</a>
             </div>
         </form>
     </div>
