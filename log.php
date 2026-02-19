@@ -40,9 +40,9 @@ include "app/controllers/users.php";
             </div>
             <div class="w-100"></div>
             <div class="mb-3 col-12 col-md-4">
-                <label for="formGroupExampleInput" class="form-label">Логин</label>
-                <input name="mail" value="<?= $email ?>" type="text" class="form-control" id="exampleInputEmail1"
-                    placeholder="введите ваш логин...">
+                <label for="formGroupExampleInput" class="form-label">Email</label>
+                <input name="mail" value="<?= $email ?>" type="email" class="form-control" id="exampleInputEmail1"
+                    placeholder="example@gmail.com">
             </div>
             <div class="w-100"></div>
             <div class="mb-3 col-12 col-md-4">

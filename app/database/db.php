@@ -246,17 +246,16 @@ function countCars($filters = [])
     return $query->fetchColumn();
 }
 
-// Рекомендуемые/топ авто для карусели
-function selectFeaturedCars($limit = 5)
+// Рекомендуемые/топ авто для карусели (все с featured=1, или последние $fallbackLimit если featured нет)
+function selectFeaturedCars($fallbackLimit = 5)
 {
     global $pdo;
-    // Сначала пробуем взять авто с featured=1
+    // Берём ВСЕ авто с featured=1
     $sql = "SELECT c.*, b.name AS brand_name
             FROM cars AS c
             JOIN brands AS b ON c.id_brand = b.id
             WHERE c.status = 1 AND c.featured = 1
-            ORDER BY c.created_date DESC
-            LIMIT $limit";
+            ORDER BY c.created_date DESC";
     $query = $pdo->prepare($sql);
     $query->execute();
     dbCheckError($query);
@@ -269,7 +268,7 @@ function selectFeaturedCars($limit = 5)
                 JOIN brands AS b ON c.id_brand = b.id
                 WHERE c.status = 1
                 ORDER BY c.created_date DESC
-                LIMIT $limit";
+                LIMIT $fallbackLimit";
         $query = $pdo->prepare($sql);
         $query->execute();
         dbCheckError($query);

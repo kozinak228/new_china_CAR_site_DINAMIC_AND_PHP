@@ -14,18 +14,21 @@ $comments = [];
 // Код для формы создания комментария
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['goComment'])) {
 
-
     $email = trim($_POST['email']);
     $comment = trim($_POST['comment']);
 
+    // Если пользователь авторизован, берём email/username из сессии
+    if (isset($_SESSION['id']) && $email === '') {
+        $email = $_SESSION['login'] ?? '';
+    }
 
     if ($email === '' || $comment === '') {
         array_push($errMsg, "Не все поля заполнены!");
-    } elseif (mb_strlen($comment, 'UTF8') < 50) {
-        array_push($errMsg, "Комментарий должен быть длинее 50 символов");
+    } elseif (mb_strlen($comment, 'UTF8') < 10) {
+        array_push($errMsg, "Комментарий должен быть длинее 10 символов");
     } else {
-        $user = selectOne('users', ['email' => $email]);
-        if ($user['email'] == $email && $user['admin'] == 1) {
+        // Если админ — авто-публикация
+        if (isset($_SESSION['admin']) && $_SESSION['admin'] == 1) {
             $status = 1;
         }
 
