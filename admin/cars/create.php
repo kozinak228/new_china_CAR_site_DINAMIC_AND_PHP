@@ -149,6 +149,11 @@ include SITE_ROOT . "/app/controllers/users.php";
                     <label class="form-check-label" for="publish">Опубликовать сразу</label>
                 </div>
 
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="featured" id="featured">
+                    <label class="form-check-label" for="featured">Показывать в карусели (лучшие предложения)</label>
+                </div>
+
                 <button type="submit" name="add_car" class="btn btn-success">
                     <i class="fas fa-plus"></i> Добавить авто
                 </button>
