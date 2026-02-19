@@ -64,7 +64,7 @@ $brands = selectAll('brands');
                                             <span><i class="fas fa-road"></i> <?= $car['body_type'] ?></span>
                                         </div>
                                         <div class="car-price">
-                                            <?= number_format($car['price'], 0, '', ' ') ?> ?
+                                            <?= number_format($car['price'], 0, '', ' ') ?> &#8381;
                                         </div>
                                     </div>
                                 </div>

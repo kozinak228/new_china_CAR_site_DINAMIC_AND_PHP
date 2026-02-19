@@ -44,25 +44,23 @@ function selectAll($table, $params = [])
     if (!empty($params)) {
         $i = 0;
         foreach ($params as $key => $value) {
-            if (!is_numeric($value)) {
-                $value = "'" . $value . "'";
-            }
             if ($i === 0) {
-                $sql = $sql . " WHERE $key=$value";
+                $sql = $sql . " WHERE $key=:$key";
             } else {
-                $sql = $sql . " AND $key=$value";
+                $sql = $sql . " AND $key=:$key";
             }
             $i++;
         }
     }
 
     $query = $pdo->prepare($sql);
-    $query->execute();
+    $query->execute($params);
     dbCheckError($query);
     return $query->fetchAll();
 }
 
 // Запрос на получение одной строки с выбранной таблицы
+// Запрос на получение одной строки с одной таблицы
 function selectOne($table, $params = [])
 {
     global $pdo;
@@ -71,20 +69,17 @@ function selectOne($table, $params = [])
     if (!empty($params)) {
         $i = 0;
         foreach ($params as $key => $value) {
-            if (!is_numeric($value)) {
-                $value = "'" . $value . "'";
-            }
             if ($i === 0) {
-                $sql = $sql . " WHERE $key=$value";
+                $sql = $sql . " WHERE $key=:$key";
             } else {
-                $sql = $sql . " AND $key=$value";
+                $sql = $sql . " AND $key=:$key";
             }
             $i++;
         }
     }
 
     $query = $pdo->prepare($sql);
-    $query->execute();
+    $query->execute($params);
     dbCheckError($query);
     return $query->fetch();
 }
@@ -99,10 +94,10 @@ function insert($table, $params)
     foreach ($params as $key => $value) {
         if ($i === 0) {
             $coll = $coll . "$key";
-            $mask = $mask . "'" . "$value" . "'";
+            $mask = $mask . ":" . "$key";
         } else {
             $coll = $coll . ", $key";
-            $mask = $mask . ", '" . "$value" . "'";
+            $mask = $mask . ", :" . "$key";
         }
         $i++;
     }
@@ -123,16 +118,16 @@ function update($table, $id, $params)
     $str = '';
     foreach ($params as $key => $value) {
         if ($i === 0) {
-            $str = $str . $key . " = '" . $value . "'";
+            $str = $str . $key . " = :" . $key;
         } else {
-            $str = $str . ", " . $key . " = '" . $value . "'";
+            $str = $str . ", " . $key . " = :" . $key;
         }
         $i++;
     }
 
     $sql = "UPDATE $table SET $str WHERE id = $id";
     $query = $pdo->prepare($sql);
-    $query->execute();
+    $query->execute($params);
     dbCheckError($query);
 }
 
