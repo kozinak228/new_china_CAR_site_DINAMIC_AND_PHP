@@ -61,16 +61,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['button-log'])) {
     $pass = trim($_POST['password']);
 
     if ($email === '' || $pass === '') {
-        array_push($errMsg, "РќРµ РІСЃРµ РїРѕР»СЏ Р·Р°РїРѕР»РЅРµРЅС‹!");
+        array_push($errMsg, "Не все поля заполнены!");
     } else {
-        $existence = selectOne('users', ['username' => $email]);
+        $existence = selectOne('users', ['email' => $email]);
         if (!$existence) {
-            $existence = selectOne('users', ['email' => $email]);
+            $existence = selectOne('users', ['username' => $email]);
         }
         if ($existence && password_verify($pass, $existence['password'])) {
             userAuth($existence);
         } else {
-            array_push($errMsg, "РџРѕС‡С‚Р° Р»РёР±Рѕ РїР°СЂРѕР»СЊ РІРІРµРґРµРЅС‹ РЅРµРІРµСЂРЅРѕ!");
+            array_push($errMsg, "Email либо пароль введены неверно!");
         }
     }
 } else {

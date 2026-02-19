@@ -24,7 +24,7 @@ if ($price_max)
 $cars = selectCarsForCatalog($perPage, $offset, $filters);
 $totalCars = countCars($filters);
 $totalPages = ceil($totalCars / $perPage);
-$featured = selectFeaturedCars(3);
+$featured = selectFeaturedCars(5);
 $brands = selectAll('brands');
 $bodyTypes = getBodyTypes();
 ?>

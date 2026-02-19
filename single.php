@@ -10,6 +10,9 @@ if (!$car) {
 }
 $carImages = selectCarImages($id);
 $brands = selectAll('brands');
+
+// Подключаем контроллер комментариев для обработки POST
+include_once SITE_ROOT . "/app/controllers/commentaries.php";
 ?>
 <!doctype html>
 <html lang="ru">
