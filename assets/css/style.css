@@ -949,3 +949,31 @@ body.dark-theme .theme-toggle-card {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
     transition: all 0.3s;
 }
+
+/* =========================================
+   TEXTAREA CURSOR + COMMENT FORM
+   ========================================= */
+
+textarea,
+.comment-textarea {
+    cursor: text !important;
+    color: #2d2d2d;
+    resize: vertical;
+}
+
+body.dark-theme textarea,
+body.dark-theme .comment-textarea {
+    color: #e0e0e0;
+    cursor: text !important;
+}
+
+/* Character counter */
+.comment-counter {
+    font-size: 0.82rem;
+    color: #888;
+}
+
+.comment-counter #charCount {
+    font-weight: 700;
+    transition: color 0.2s;
+}
