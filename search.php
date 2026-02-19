@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search-term'])) {
                                                 <?= $car['horsepower'] ?> л.с.</span>
                                         </div>
                                         <div class="car-price">
-                                            <?= number_format($car['price'], 0, '', ' ') ?> ?
+                                            <?= number_format($car['price'], 0, '', ' ') ?> &#8381;
                                         </div>
                                     </div>
                                 </div>

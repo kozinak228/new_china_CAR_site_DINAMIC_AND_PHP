@@ -7,7 +7,6 @@ $brands = selectAll('brands');
 ?>
 <!doctype html>
 <html lang="ru">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,9 +18,8 @@ $brands = selectAll('brands');
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <title>Р“Р°Р»РµСЂРµСЏ вЂ” ChinaCars</title>
+    <title>Галерея — ChinaCars</title>
 </head>
-
 <body>
 
     <?php include("app/include/header.php"); ?>
@@ -29,12 +27,12 @@ $brands = selectAll('brands');
     <div class="container">
         <div class="content row">
             <div class="main-content col-12">
-                <h2>Р“Р°Р»РµСЂРµСЏ Р°РІС‚РѕРјРѕР±РёР»РµР№</h2>
+                <h2>Галерея автомобилей</h2>
                 <div class="row gallery-grid">
                     <?php foreach ($allCars as $car): ?>
                         <?php
                         $images = selectCarImages($car['id']);
-                        // РџРѕРєР°Р·С‹РІР°РµРј РіР»Р°РІРЅРѕРµ С„РѕС‚Рѕ
+                        // Показываем главное фото
                         if ($car['img']):
                             ?>
                             <div class="col-md-4 col-6 mb-3">
@@ -52,7 +50,7 @@ $brands = selectAll('brands');
                             </div>
                             <?php
                         endif;
-                        // РџРѕРєР°Р·С‹РІР°РµРј РґРѕРї. С„РѕС‚Рѕ РёР· РіР°Р»РµСЂРµРё
+                        // Показываем доп. фото из галереи
                         foreach ($images as $image):
                             ?>
                             <div class="col-md-4 col-6 mb-3">
@@ -73,7 +71,7 @@ $brands = selectAll('brands');
 
                     <?php if (count($allCars) == 0): ?>
                         <div class="col-12">
-                            <p>Р’ РіР°Р»РµСЂРµРµ РїРѕРєР° РЅРµС‚ С„РѕС‚РѕРіСЂР°С„РёР№.</p>
+                            <p>В галерее пока нет фотографий.</p>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -87,5 +85,4 @@ $brands = selectAll('brands');
         integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
         crossorigin="anonymous"></script>
 </body>
-
 </html>
