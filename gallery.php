@@ -20,7 +20,7 @@ $brands = selectAll('brands');
         rel="stylesheet">
     <title>Галерея — ChinaCars</title>
 </head>
-<body>
+<body class="<?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark-theme' : '' ?>">
 
     <?php include("app/include/header.php"); ?>
 
