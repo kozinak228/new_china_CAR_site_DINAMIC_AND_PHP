@@ -250,16 +250,33 @@ function countCars($filters = [])
 function selectFeaturedCars($limit = 5)
 {
     global $pdo;
+    // Сначала пробуем взять авто с featured=1
     $sql = "SELECT c.*, b.name AS brand_name
             FROM cars AS c
             JOIN brands AS b ON c.id_brand = b.id
-            WHERE c.status = 1
+            WHERE c.status = 1 AND c.featured = 1
             ORDER BY c.created_date DESC
             LIMIT $limit";
     $query = $pdo->prepare($sql);
     $query->execute();
     dbCheckError($query);
-    return $query->fetchAll();
+    $result = $query->fetchAll();
+
+    // Если нет featured, берём последние добавленные
+    if (empty($result)) {
+        $sql = "SELECT c.*, b.name AS brand_name
+                FROM cars AS c
+                JOIN brands AS b ON c.id_brand = b.id
+                WHERE c.status = 1
+                ORDER BY c.created_date DESC
+                LIMIT $limit";
+        $query = $pdo->prepare($sql);
+        $query->execute();
+        dbCheckError($query);
+        $result = $query->fetchAll();
+    }
+
+    return $result;
 }
 
 // Получить одно авто по ID (полная информация)

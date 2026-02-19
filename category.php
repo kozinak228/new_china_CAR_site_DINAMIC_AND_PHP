@@ -86,15 +86,20 @@ $brands = selectAll('brands');
                     </form>
                 </div>
 
-                <div class="section topics">
-                    <h3>Бренды</h3>
-                    <ul>
-                        <?php foreach ($brands as $b): ?>
-                            <li>
+                <div class="section topics brands-section">
+                    <h3 class="brands-toggle" onclick="toggleBrands()">Бренды <span id="brands-arrow">▼</span></h3>
+                    <input type="text" id="brand-search" class="brand-search-input" placeholder="Поиск бренда..." oninput="filterBrands()">
+                    <ul id="brands-list">
+                        <li><a href="<?= BASE_URL ?>">Все бренды</a></li>
+                        <?php foreach ($brands as $i => $b): ?>
+                            <li class="brand-item <?= $i >= 5 ? 'brand-hidden' : '' ?>" data-name="<?= mb_strtolower($b['name']) ?>">
                                 <a href="<?= BASE_URL . 'category.php?id=' . $b['id']; ?>"><?= $b['name']; ?></a>
                             </li>
                         <?php endforeach; ?>
                     </ul>
+                    <?php if (count($brands) > 5): ?>
+                        <button type="button" class="btn btn-sm btn-outline-secondary w-100 mt-2" id="brands-show-all" onclick="showAllBrands()">Показать все (<?= count($brands) ?>)</button>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -105,6 +110,66 @@ $brands = selectAll('brands');
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
         crossorigin="anonymous"></script>
+    <script>
+        let brandsExpanded = false;
+        let brandsCollapsed = false;
+
+        function toggleBrands() {
+            const list = document.getElementById('brands-list');
+            const arrow = document.getElementById('brands-arrow');
+            const search = document.getElementById('brand-search');
+            const showAllBtn = document.getElementById('brands-show-all');
+            brandsCollapsed = !brandsCollapsed;
+            if (brandsCollapsed) {
+                list.style.display = 'none';
+                search.style.display = 'none';
+                if (showAllBtn) showAllBtn.style.display = 'none';
+                arrow.textContent = '▶';
+            } else {
+                list.style.display = '';
+                search.style.display = '';
+                if (showAllBtn) showAllBtn.style.display = '';
+                arrow.textContent = '▼';
+            }
+        }
+
+        function showAllBrands() {
+            const items = document.querySelectorAll('.brand-item');
+            const btn = document.getElementById('brands-show-all');
+            brandsExpanded = !brandsExpanded;
+            items.forEach(item => {
+                if (brandsExpanded) {
+                    item.classList.remove('brand-hidden');
+                } else {
+                    const allItems = Array.from(document.querySelectorAll('.brand-item'));
+                    const idx = allItems.indexOf(item);
+                    if (idx >= 5) item.classList.add('brand-hidden');
+                }
+            });
+            btn.textContent = brandsExpanded ? 'Свернуть' : 'Показать все (' + document.querySelectorAll('.brand-item').length + ')';
+        }
+
+        function filterBrands() {
+            const query = document.getElementById('brand-search').value.toLowerCase();
+            const items = document.querySelectorAll('.brand-item');
+            const btn = document.getElementById('brands-show-all');
+            items.forEach(item => {
+                const name = item.getAttribute('data-name');
+                if (query === '') {
+                    if (!brandsExpanded) {
+                        const allItems = Array.from(document.querySelectorAll('.brand-item'));
+                        const idx = allItems.indexOf(item);
+                        item.style.display = idx >= 5 ? 'none' : '';
+                    } else {
+                        item.style.display = '';
+                    }
+                } else {
+                    item.style.display = name.includes(query) ? '' : 'none';
+                }
+            });
+            if (btn) btn.style.display = query ? 'none' : '';
+        }
+    </script>
 </body>
 
 </html>

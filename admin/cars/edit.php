@@ -197,6 +197,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
                     <label class="form-check-label" for="publish">Опубликовать</label>
                 </div>
 
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="featured" id="featured"
+                        <?= (!empty($car['featured']) && $car['featured'] == 1) ? 'checked' : '' ?>>
+                    <label class="form-check-label" for="featured">Показывать в карусели (лучшие предложения)</label>
+                </div>
+
                 <button type="submit" name="edit_car" class="btn btn-primary">
                     <i class="fas fa-save"></i> Сохранить
                 </button>

@@ -46,11 +46,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_car'])) {
     $description = trim($_POST['description']);
     $brand = trim($_POST['brand']);
     $publish = isset($_POST['publish']) ? 1 : 0;
+    $featured = isset($_POST['featured']) ? 1 : 0;
 
     if ($title === '' || $brand === '') {
-        array_push($errMsg, "РќРµ РІСЃРµ РѕР±СЏР·Р°С‚РµР»СЊРЅС‹Рµ РїРѕР»СЏ Р·Р°РїРѕР»РЅРµРЅС‹!");
+        array_push($errMsg, "Не все обязательные поля заполнены!");
     } elseif (mb_strlen($title, 'UTF8') < 3) {
-        array_push($errMsg, "РќР°Р·РІР°РЅРёРµ Р°РІС‚Рѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ Р±РѕР»РµРµ 3-С… СЃРёРјРІРѕР»РѕРІ");
+        array_push($errMsg, "Название авто должно быть более 3-х символов");
     } else {
         $car = [
             'id_user' => $_SESSION['id'],
@@ -68,12 +69,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_car'])) {
             'color' => $_POST['color'] ?? '',
             'description' => $description,
             'img' => $_POST['img'],
-            'status' => $publish
+            'status' => $publish,
+            'featured' => $featured
         ];
 
         $carId = insert('cars', $car);
 
-        // Р—Р°РіСЂСѓР·РєР° РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹С… С„РѕС‚Рѕ (РіР°Р»РµСЂРµСЏ)
+        // Загрузка дополнительных фото (галерея)
         if (!empty($_FILES['gallery']['name'][0])) {
             if (!is_dir(ROOT_PATH . "/assets/images/cars")) {
                 mkdir(ROOT_PATH . "/assets/images/cars", 0777, true);
@@ -103,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_car'])) {
     $brand = '';
 }
 
-// Р—Р°РіСЂСѓР·РєР° РґР°РЅРЅС‹С… Р°РІС‚Рѕ РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ
+// Загрузка данных авто для редактирования
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
     $car = selectOne('cars', ['id' => $_GET['id']]);
     $id = $car['id'];
@@ -113,15 +115,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
     $publish = $car['status'];
 }
 
-// РЎРѕС…СЂР°РЅРµРЅРёРµ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ Р°РІС‚Рѕ
+// Сохранение редактирования авто
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_car'])) {
     $id = $_POST['id'];
     $title = trim($_POST['title']);
     $description = trim($_POST['description']);
     $brand = trim($_POST['brand']);
     $publish = isset($_POST['publish']) ? 1 : 0;
+    $featured = isset($_POST['featured']) ? 1 : 0;
 
-    // РќРѕРІРѕРµ РіР»Р°РІРЅРѕРµ С„РѕС‚Рѕ
+    // Новое главное фото
     if (!empty($_FILES['img']['name'])) {
         $imgName = time() . "_" . $_FILES['img']['name'];
         $fileTmpName = $_FILES['img']['tmp_name'];
@@ -140,9 +143,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_car'])) {
     }
 
     if ($title === '' || $brand === '') {
-        array_push($errMsg, "РќРµ РІСЃРµ РѕР±СЏР·Р°С‚РµР»СЊРЅС‹Рµ РїРѕР»СЏ Р·Р°РїРѕР»РЅРµРЅС‹!");
+        array_push($errMsg, "Не все обязательные поля заполнены!");
     } elseif (mb_strlen($title, 'UTF8') < 3) {
-        array_push($errMsg, "РќР°Р·РІР°РЅРёРµ Р°РІС‚Рѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ Р±РѕР»РµРµ 3-С… СЃРёРјРІРѕР»РѕРІ");
+        array_push($errMsg, "Название авто должно быть более 3-х символов");
     } else {
         $car = [
             'id_user' => $_SESSION['id'],
@@ -160,12 +163,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_car'])) {
             'color' => $_POST['color'] ?? '',
             'description' => $description,
             'img' => $_POST['img'],
-            'status' => $publish
+            'status' => $publish,
+            'featured' => $featured
         ];
 
         update('cars', $id, $car);
 
-        // Р—Р°РіСЂСѓР·РєР° РЅРѕРІС‹С… С„РѕС‚Рѕ РІ РіР°Р»РµСЂРµСЋ
+        // Загрузка новых фото в галерею
         if (!empty($_FILES['gallery']['name'][0])) {
             if (!is_dir(ROOT_PATH . "/assets/images/cars")) {
                 mkdir(ROOT_PATH . "/assets/images/cars", 0777, true);
