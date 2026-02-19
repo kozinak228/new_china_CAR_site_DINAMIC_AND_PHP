@@ -7,7 +7,7 @@ $page = $_GET['id'] ?? $_GET['post'] ?? '';
 $email = '';
 $comment = '';
 $errMsg = [];
-$status = 0;
+$status = 1; // все комментарии публикуются сразу
 $comments = [];
 
 
@@ -68,13 +68,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['pub_id'])) {
 }
 
 
-// АПДЕЙТ СТАТЬИ
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
-    $oneComment = selectOne('comments', ['id' => $_GET['id']]);
-    $id = $oneComment['id'];
-    $email = $oneComment['email'];
-    $text1 = $oneComment['comment'];
-    $pub = $oneComment['status'];
+// АПДЕЙТ КОММЕНТАРИЯ (только в админке)
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['edit_id'])) {
+    $oneComment = selectOne('comments', ['id' => $_GET['edit_id']]);
+    if ($oneComment) {
+        $id = $oneComment['id'];
+        $email = $oneComment['email'];
+        $text1 = $oneComment['comment'];
+        $pub = $oneComment['status'];
+    }
 }
 
 

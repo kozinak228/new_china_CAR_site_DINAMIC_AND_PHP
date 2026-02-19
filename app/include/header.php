@@ -21,6 +21,8 @@
                                 <?php if ($_SESSION['admin']): ?>
                                     <li><a href="<?php echo BASE_URL . 'admin/cars/index.php'; ?>">Админ панель</a></li>
                                 <?php endif; ?>
+                                <li><a href="<?php echo BASE_URL . 'profile.php'; ?>"><i class="fas fa-palette"></i> Личный
+                                        кабинет</a></li>
                                 <li><a href="<?php echo BASE_URL . "logout.php"; ?>">Выход</a></li>
                             </ul>
                         <?php else: ?>

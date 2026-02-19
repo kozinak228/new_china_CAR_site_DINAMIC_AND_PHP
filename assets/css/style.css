@@ -713,3 +713,239 @@ COMMENTS
     border-color: #e94560;
     color: #c23152;
 }
+
+/* =========================================
+   DARK THEME
+   ========================================= */
+
+body.dark-theme {
+    background: #121212;
+    color: #e0e0e0;
+}
+
+body.dark-theme h1,
+body.dark-theme h2,
+body.dark-theme h3,
+body.dark-theme h4,
+body.dark-theme h5,
+body.dark-theme h6 {
+    color: #f0f0f0;
+}
+
+body.dark-theme header {
+    background: #1a1a2e;
+    border-bottom: 1px solid #333;
+}
+
+body.dark-theme header h1 a,
+body.dark-theme header nav ul li a {
+    color: #e0e0e0;
+}
+
+body.dark-theme header nav ul li a:hover {
+    color: #e94560;
+}
+
+body.dark-theme header nav ul ul {
+    background: #1e1e2e;
+    border: 1px solid #333;
+}
+
+body.dark-theme .sidebar {
+    background: #1e1e2e;
+    border-radius: 8px;
+}
+
+body.dark-theme .sidebar .section {
+    background: #252535;
+    border-radius: 6px;
+}
+
+body.dark-theme .sidebar h3 {
+    color: #e94560;
+}
+
+body.dark-theme .sidebar ul li a {
+    color: #ccc;
+    background: transparent;
+}
+
+body.dark-theme .sidebar ul li a:hover {
+    color: #fff;
+    background: #0f3460;
+}
+
+body.dark-theme .car-card {
+    background: #1e1e2e;
+    border-color: #333;
+}
+
+body.dark-theme .car-card .car-title {
+    color: #f0f0f0;
+}
+
+body.dark-theme .car-card .car-info {
+    color: #aaa;
+}
+
+body.dark-theme .car-card:hover {
+    border-color: #e94560;
+    box-shadow: 0 6px 24px rgba(233, 69, 96, 0.2);
+}
+
+body.dark-theme .single_post,
+body.dark-theme .comments {
+    background: #1e1e2e;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+body.dark-theme .table {
+    color: #e0e0e0;
+}
+
+body.dark-theme .table-striped>tbody>tr:nth-of-type(odd) {
+    background: #252535;
+}
+
+body.dark-theme .form-control,
+body.dark-theme input,
+body.dark-theme textarea,
+body.dark-theme select {
+    background: #252535;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+body.dark-theme .form-control:focus,
+body.dark-theme input:focus,
+body.dark-theme textarea:focus {
+    background: #2d2d45;
+    border-color: #e94560;
+    color: #fff;
+}
+
+body.dark-theme footer {
+    background: #1a1a2e;
+    color: #aaa;
+}
+
+body.dark-theme .brand-search-input {
+    background: #252535;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+body.dark-theme .brand-search-input:focus {
+    border-color: #e94560;
+}
+
+body.dark-theme .one-comment {
+    background: #252535;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 8px;
+}
+
+/* =========================================
+   PROFILE PAGE
+   ========================================= */
+
+.profile-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+body.dark-theme .profile-card {
+    background: #1e1e2e;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.profile-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+body.dark-theme .profile-row {
+    border-bottom-color: #333;
+}
+
+.profile-label {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.profile-value {
+    font-weight: 600;
+}
+
+.badge-admin {
+    background: #e94560;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+.badge-user {
+    background: #0f3460;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+/* Theme toggle switch */
+.theme-toggle-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 14px 18px;
+}
+
+body.dark-theme .theme-toggle-card {
+    background: #252535;
+}
+
+.theme-toggle-label {
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-theme-toggle {
+    width: 56px;
+    height: 28px;
+    border-radius: 20px;
+    background: #ccc;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.3s;
+    display: flex;
+    align-items: center;
+    padding: 0 3px;
+}
+
+.btn-theme-toggle.is-dark {
+    background: #e94560;
+    justify-content: flex-end;
+}
+
+.toggle-circle {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    display: block;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s;
+}
