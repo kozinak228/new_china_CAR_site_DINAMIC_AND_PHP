@@ -125,7 +125,8 @@ function update($table, $id, $params)
         $i++;
     }
 
-    $sql = "UPDATE $table SET $str WHERE id = $id";
+    $sql = "UPDATE $table SET $str WHERE id = :id";
+    $params['id'] = $id;
     $query = $pdo->prepare($sql);
     $query->execute($params);
     dbCheckError($query);
@@ -135,9 +136,9 @@ function update($table, $id, $params)
 function delete($table, $id)
 {
     global $pdo;
-    $sql = "DELETE FROM $table WHERE id =" . $id;
+    $sql = "DELETE FROM $table WHERE id = :id";
     $query = $pdo->prepare($sql);
-    $query->execute();
+    $query->execute(['id' => $id]);
     dbCheckError($query);
 }
 
@@ -150,20 +151,17 @@ function countRow($table, $params = [])
     if (!empty($params)) {
         $i = 0;
         foreach ($params as $key => $value) {
-            if (!is_numeric($value)) {
-                $value = "'" . $value . "'";
-            }
             if ($i === 0) {
-                $sql = $sql . " WHERE $key=$value";
+                $sql = $sql . " WHERE $key=:$key";
             } else {
-                $sql = $sql . " AND $key=$value";
+                $sql = $sql . " AND $key=:$key";
             }
             $i++;
         }
     }
 
     $query = $pdo->prepare($sql);
-    $query->execute();
+    $query->execute($params);
     dbCheckError($query);
     return $query->fetchColumn();
 }
@@ -172,7 +170,7 @@ function countRow($table, $params = [])
 // ФУНКЦИИ ДЛЯ КАТАЛОГА АВТО
 // ==========================================
 
-// Получить все авто с именем бренда (для админки)
+// Получить все авто с именем бренда (для админки) без лимита (если где-то еще надо)
 function selectAllCarsWithBrands()
 {
     global $pdo;
@@ -187,6 +185,33 @@ function selectAllCarsWithBrands()
     return $query->fetchAll();
 }
 
+// Получить машины для админки с пагинацией
+function selectCarsWithBrandsForAdmin($limit, $offset)
+{
+    global $pdo;
+    $sql = "SELECT c.*, b.name AS brand_name, u.username
+            FROM cars AS c
+            JOIN brands AS b ON c.id_brand = b.id
+            JOIN users AS u ON c.id_user = u.id
+            ORDER BY c.created_date DESC 
+            LIMIT $limit OFFSET $offset";
+    $query = $pdo->prepare($sql);
+    $query->execute();
+    dbCheckError($query);
+    return $query->fetchAll();
+}
+
+// Подсчет всех машин для пагинации админки
+function countAllCarsForAdmin()
+{
+    global $pdo;
+    $sql = "SELECT COUNT(*) FROM cars";
+    $query = $pdo->prepare($sql);
+    $query->execute();
+    dbCheckError($query);
+    return $query->fetchColumn();
+}
+
 // Получить авто для каталога (с пагинацией, фильтрами)
 function selectCarsForCatalog($limit, $offset, $filters = [])
 {
@@ -196,25 +221,30 @@ function selectCarsForCatalog($limit, $offset, $filters = [])
             JOIN brands AS b ON c.id_brand = b.id
             WHERE c.status = 1";
 
+    $params = [];
+
     if (!empty($filters['brand'])) {
         $brand = intval($filters['brand']);
-        $sql .= " AND c.id_brand = $brand";
+        $sql .= " AND c.id_brand = :brand";
+        $params['brand'] = $brand;
     }
     if (!empty($filters['body_type'])) {
-        $body = $pdo->quote($filters['body_type']);
-        $sql .= " AND c.body_type = $body";
+        $sql .= " AND c.body_type = :body_type";
+        $params['body_type'] = $filters['body_type'];
     }
     if (!empty($filters['price_min'])) {
-        $sql .= " AND c.price >= " . floatval($filters['price_min']);
+        $sql .= " AND c.price >= :price_min";
+        $params['price_min'] = floatval($filters['price_min']);
     }
     if (!empty($filters['price_max'])) {
-        $sql .= " AND c.price <= " . floatval($filters['price_max']);
+        $sql .= " AND c.price <= :price_max";
+        $params['price_max'] = floatval($filters['price_max']);
     }
 
     $sql .= " ORDER BY c.created_date DESC LIMIT $limit OFFSET $offset";
 
     $query = $pdo->prepare($sql);
-    $query->execute();
+    $query->execute($params);
     dbCheckError($query);
     return $query->fetchAll();
 }
@@ -225,23 +255,28 @@ function countCars($filters = [])
     global $pdo;
     $sql = "SELECT COUNT(*) FROM cars AS c WHERE c.status = 1";
 
+    $params = [];
+
     if (!empty($filters['brand'])) {
         $brand = intval($filters['brand']);
-        $sql .= " AND c.id_brand = $brand";
+        $sql .= " AND c.id_brand = :brand";
+        $params['brand'] = $brand;
     }
     if (!empty($filters['body_type'])) {
-        $body = $pdo->quote($filters['body_type']);
-        $sql .= " AND c.body_type = $body";
+        $sql .= " AND c.body_type = :body_type";
+        $params['body_type'] = $filters['body_type'];
     }
     if (!empty($filters['price_min'])) {
-        $sql .= " AND c.price >= " . floatval($filters['price_min']);
+        $sql .= " AND c.price >= :price_min";
+        $params['price_min'] = floatval($filters['price_min']);
     }
     if (!empty($filters['price_max'])) {
-        $sql .= " AND c.price <= " . floatval($filters['price_max']);
+        $sql .= " AND c.price <= :price_max";
+        $params['price_max'] = floatval($filters['price_max']);
     }
 
     $query = $pdo->prepare($sql);
-    $query->execute();
+    $query->execute($params);
     dbCheckError($query);
     return $query->fetchColumn();
 }
@@ -287,9 +322,9 @@ function selectCarById($id)
             FROM cars AS c
             JOIN brands AS b ON c.id_brand = b.id
             JOIN users AS u ON c.id_user = u.id
-            WHERE c.id = $id";
+            WHERE c.id = :id";
     $query = $pdo->prepare($sql);
-    $query->execute();
+    $query->execute(['id' => $id]);
     dbCheckError($query);
     return $query->fetch();
 }
@@ -299,9 +334,9 @@ function selectCarImages($carId)
 {
     global $pdo;
     $carId = intval($carId);
-    $sql = "SELECT * FROM car_images WHERE id_car = $carId ORDER BY sort_order ASC";
+    $sql = "SELECT * FROM car_images WHERE id_car = :id_car ORDER BY sort_order ASC";
     $query = $pdo->prepare($sql);
-    $query->execute();
+    $query->execute(['id_car' => $carId]);
     dbCheckError($query);
     return $query->fetchAll();
 }
@@ -321,9 +356,9 @@ function insertCarImage($carId, $img, $sortOrder = 0)
 function deleteCarImage($id)
 {
     global $pdo;
-    $sql = "DELETE FROM car_images WHERE id = " . intval($id);
+    $sql = "DELETE FROM car_images WHERE id = :id";
     $query = $pdo->prepare($sql);
-    $query->execute();
+    $query->execute(['id' => intval($id)]);
     dbCheckError($query);
 }
 
@@ -336,10 +371,10 @@ function searchCars($text)
             FROM cars AS c
             JOIN brands AS b ON c.id_brand = b.id
             WHERE c.status = 1
-            AND (c.title LIKE '%$text%' OR c.description LIKE '%$text%' OR b.name LIKE '%$text%')
+            AND (c.title LIKE :text OR c.description LIKE :text OR b.name LIKE :text)
             ORDER BY c.created_date DESC";
     $query = $pdo->prepare($sql);
-    $query->execute();
+    $query->execute(['text' => "%$text%"]);
     dbCheckError($query);
     return $query->fetchAll();
 }

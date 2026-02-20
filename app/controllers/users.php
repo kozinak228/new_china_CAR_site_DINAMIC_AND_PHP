@@ -1,5 +1,6 @@
 <?php
 include_once SITE_ROOT . "/app/database/db.php";
+include_once SITE_ROOT . "/app/helps/csrf_helper.php";
 
 $errMsg = [];
 
@@ -7,6 +8,7 @@ function userAuth($user)
 {
     $_SESSION['id'] = $user['id'];
     $_SESSION['login'] = $user['username'];
+    $_SESSION['email'] = $user['email'] ?? '';
     $_SESSION['admin'] = $user['admin'];
     if ($_SESSION['admin']) {
         header('location: ' . BASE_URL . "admin/cars/index.php");
@@ -20,33 +22,37 @@ $users = selectAll('users');
 // РљРѕРґ РґР»СЏ С„РѕСЂРјС‹ СЂРµРіРёСЃС‚СЂР°С†РёРё
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['button-reg'])) {
 
-    $admin = 0;
-    $login = trim($_POST['login']);
-    $email = trim($_POST['mail']);
-    $passF = trim($_POST['pass-first']);
-    $passS = trim($_POST['pass-second']);
-
-    if ($login === '' || $email === '' || $passF === '') {
-        array_push($errMsg, "РќРµ РІСЃРµ РїРѕР»СЏ Р·Р°РїРѕР»РЅРµРЅС‹!");
-    } elseif (mb_strlen($login, 'UTF8') < 2) {
-        array_push($errMsg, "Р›РѕРіРёРЅ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±РѕР»РµРµ 2-С… СЃРёРјРІРѕР»РѕРІ");
-    } elseif ($passF !== $passS) {
-        array_push($errMsg, "РџР°СЂРѕР»Рё РІ РѕР±РµРёС… РїРѕР»СЏС… РґРѕР»Р¶РЅС‹ СЃРѕРѕС‚РІРµС‚СЃС‚РІРѕРІР°С‚СЊ!");
+    if (!validateCsrfToken($_POST)) {
+        array_push($errMsg, "Ошибка CSRF токена! Попробуйте отправить форму еще раз.");
     } else {
-        $existence = selectOne('users', ['email' => $email]);
-        if ($existence['email'] === $email) {
-            array_push($errMsg, "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРѕР№ РїРѕС‡С‚РѕР№ СѓР¶Рµ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ!");
+        $admin = 0;
+        $login = trim($_POST['login']);
+        $email = trim($_POST['mail']);
+        $passF = trim($_POST['pass-first']);
+        $passS = trim($_POST['pass-second']);
+
+        if ($login === '' || $email === '' || $passF === '') {
+            array_push($errMsg, "РќРµ РІСЃРµ РїРѕР»СЏ Р·Р°РїРѕР»РЅРµРЅС‹!");
+        } elseif (mb_strlen($login, 'UTF8') < 2) {
+            array_push($errMsg, "Р›РѕРіРёРЅ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±РѕР»РµРµ 2-С… СЃРёРјРІРѕР»РѕРІ");
+        } elseif ($passF !== $passS) {
+            array_push($errMsg, "РџР°СЂРѕР»Рё РІ РѕР±РµРёС… РїРѕР»СЏС… РґРѕР»Р¶РЅС‹ СЃРѕРѕС‚РІРµС‚СЃС‚РІРѕРІР°С‚СЊ!");
         } else {
-            $pass = password_hash($passF, PASSWORD_DEFAULT);
-            $post = [
-                'admin' => $admin,
-                'username' => $login,
-                'email' => $email,
-                'password' => $pass
-            ];
-            $id = insert('users', $post);
-            $user = selectOne('users', ['id' => $id]);
-            userAuth($user);
+            $existence = selectOne('users', ['email' => $email]);
+            if ($existence && $existence['email'] === $email) {
+                array_push($errMsg, "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРѕР№ РїРѕС‡С‚РѕР№ СѓР¶Рµ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ!");
+            } else {
+                $pass = password_hash($passF, PASSWORD_DEFAULT);
+                $post = [
+                    'admin' => $admin,
+                    'username' => $login,
+                    'email' => $email,
+                    'password' => $pass
+                ];
+                $id = insert('users', $post);
+                $user = selectOne('users', ['id' => $id]);
+                userAuth($user);
+            }
         }
     }
 } else {
@@ -54,23 +60,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['button-reg'])) {
     $email = '';
 }
 
-// РљРѕРґ РґР»СЏ С„РѕСЂРјС‹ Р°РІС‚РѕСЂРёР·Р°С†РёРё
+// Код для формы авторизации
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['button-log'])) {
 
-    $email = trim($_POST['mail']);
-    $pass = trim($_POST['password']);
-
-    if ($email === '' || $pass === '') {
-        array_push($errMsg, "Не все поля заполнены!");
+    if (!validateCsrfToken($_POST)) {
+        array_push($errMsg, "Ошибка CSRF токена! Попробуйте отправить форму еще раз.");
     } else {
-        $existence = selectOne('users', ['email' => $email]);
-        if (!$existence) {
-            $existence = selectOne('users', ['username' => $email]);
-        }
-        if ($existence && password_verify($pass, $existence['password'])) {
-            userAuth($existence);
+        $email = trim($_POST['mail']);
+        $pass = trim($_POST['password']);
+
+        if ($email === '' || $pass === '') {
+            array_push($errMsg, "Не все поля заполнены!");
         } else {
-            array_push($errMsg, "Email либо пароль введены неверно!");
+            // Защита от брутфорса
+            global $pdo;
+            $ip = $_SERVER['REMOTE_ADDR'];
+
+            // Очистка старых попыток (старше 5 минут)
+            $stmt_cleanup = $pdo->prepare("DELETE FROM login_attempts WHERE last_attempt_time < DATE_SUB(NOW(), INTERVAL 5 MINUTE)");
+            $stmt_cleanup->execute();
+
+            $stmt_check = $pdo->prepare("SELECT attempts, TIME_TO_SEC(TIMEDIFF(DATE_ADD(last_attempt_time, INTERVAL 5 MINUTE), NOW())) as time_left FROM login_attempts WHERE ip_address = ?");
+            $stmt_check->execute([$ip]);
+            $attempt_row = $stmt_check->fetch();
+
+            if ($attempt_row && $attempt_row['attempts'] >= 5 && $attempt_row['time_left'] > 0) {
+                // Передаем оставшееся время в секундах через скрытое поле ошибки массива
+                $timeLeft = (int) $attempt_row['time_left'];
+                array_push($errMsg, "BLOCKED_TIMER:" . $timeLeft);
+            } else {
+                $existence = selectOne('users', ['email' => $email]);
+                if (!$existence) {
+                    $existence = selectOne('users', ['username' => $email]);
+                }
+
+                if ($existence && password_verify($pass, $existence['password'])) {
+                    // Успешный вход: сбрасываем попытки
+                    $stmt_clear = $pdo->prepare("DELETE FROM login_attempts WHERE ip_address = ?");
+                    $stmt_clear->execute([$ip]);
+                    userAuth($existence);
+                } else {
+                    // Неудачный вход: увеличиваем счетчик
+                    if ($attempt_row) {
+                        $stmt_update = $pdo->prepare("UPDATE login_attempts SET attempts = attempts + 1, last_attempt_time = NOW() WHERE ip_address = ?");
+                        $stmt_update->execute([$ip]);
+                    } else {
+                        $stmt_insert = $pdo->prepare("INSERT INTO login_attempts (ip_address, attempts, last_attempt_time) VALUES (?, 1, NOW())");
+                        $stmt_insert->execute([$ip]);
+                    }
+                    array_push($errMsg, "Email либо пароль введены неверно!");
+                }
+            }
         }
     }
 } else {
@@ -80,36 +120,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['button-log'])) {
 // РљРѕРґ РґРѕР±Р°РІР»РµРЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РІ Р°РґРјРёРЅРєРµ
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create-user'])) {
 
-
-    $admin = 0;
-    $login = trim($_POST['login']);
-    $email = trim($_POST['mail']);
-    $passF = trim($_POST['pass-first']);
-    $passS = trim($_POST['pass-second']);
-
-    if ($login === '' || $email === '' || $passF === '') {
-        array_push($errMsg, "РќРµ РІСЃРµ РїРѕР»СЏ Р·Р°РїРѕР»РЅРµРЅС‹!");
-    } elseif (mb_strlen($login, 'UTF8') < 2) {
-        array_push($errMsg, "Р›РѕРіРёРЅ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±РѕР»РµРµ 2-С… СЃРёРјРІРѕР»РѕРІ");
-    } elseif ($passF !== $passS) {
-        array_push($errMsg, "РџР°СЂРѕР»Рё РІ РѕР±РµРёС… РїРѕР»СЏС… РґРѕР»Р¶РЅС‹ СЃРѕРѕС‚РІРµС‚СЃС‚РІРѕРІР°С‚СЊ!");
+    if (!validateCsrfToken($_POST)) {
+        array_push($errMsg, "Ошибка проверки безопасности (CSRF).");
     } else {
-        $existence = selectOne('users', ['email' => $email]);
-        if ($existence['email'] === $email) {
-            array_push($errMsg, "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРѕР№ РїРѕС‡С‚РѕР№ СѓР¶Рµ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ!");
+        $admin = 0;
+        $login = trim($_POST['login']);
+        $email = trim($_POST['mail']);
+        $passF = trim($_POST['pass-first']);
+        $passS = trim($_POST['pass-second']);
+
+        if ($login === '' || $email === '' || $passF === '') {
+            array_push($errMsg, "РќРµ РІСЃРµ РїРѕР»СЏ Р·Р°РїРѕР»РЅРµРЅС‹!");
+        } elseif (mb_strlen($login, 'UTF8') < 2) {
+            array_push($errMsg, "Р›РѕРіРёРЅ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±РѕР»РµРµ 2-С… СЃРёРјРІРѕР»РѕРІ");
+        } elseif ($passF !== $passS) {
+            array_push($errMsg, "РџР°СЂРѕР»Рё РІ РѕР±РµРёС… РїРѕР»СЏС… РґРѕР»Р¶РЅС‹ СЃРѕРѕС‚РІРµС‚СЃС‚РІРѕРІР°С‚СЊ!");
         } else {
-            $pass = password_hash($passF, PASSWORD_DEFAULT);
-            if (isset($_POST['admin']))
-                $admin = 1;
-            $user = [
-                'admin' => $admin,
-                'username' => $login,
-                'email' => $email,
-                'password' => $pass
-            ];
-            $id = insert('users', $user);
-            $user = selectOne('users', ['id' => $id]);
-            userAuth($user);
+            $existence = selectOne('users', ['email' => $email]);
+            if ($existence && $existence['email'] === $email) {
+                array_push($errMsg, "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРѕР№ РїРѕС‡С‚РѕР№ СѓР¶Рµ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ!");
+            } else {
+                $pass = password_hash($passF, PASSWORD_DEFAULT);
+                if (isset($_POST['admin']))
+                    $admin = 1;
+                $user = [
+                    'admin' => $admin,
+                    'username' => $login,
+                    'email' => $email,
+                    'password' => $pass
+                ];
+                $id = insert('users', $user);
+                $user = selectOne('users', ['id' => $id]);
+                userAuth($user);
+            }
         }
     }
 } else {
@@ -117,14 +160,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create-user'])) {
     $email = '';
 }
 
-// РљРѕРґ СѓРґР°Р»РµРЅРёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РІ Р°РґРјРёРЅРєРµ
+// Код удаления пользователя в админке
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['delete_id'])) {
     $id = $_GET['delete_id'];
-    delete('users', $id);
+
+    // Получаем пользователя, чтобы узнать его email (для удаления комментов)
+    $user = selectOne('users', ['id' => $id]);
+
+    if ($user) {
+        // 1. Находим все машины, которые добавил этот пользователь
+        $userCars = selectAll('cars', ['id_user' => $id]);
+
+        foreach ($userCars as $car) {
+            $carId = $car['id'];
+
+            // 1.1 Удаляем главное фото машины с диска
+            if (!empty($car['img']) && file_exists(ROOT_PATH . "/assets/images/cars/" . $car['img'])) {
+                unlink(ROOT_PATH . "/assets/images/cars/" . $car['img']);
+            }
+
+            // 1.2 Получаем галерею машины и удаляем все фото с диска
+            $carImages = selectCarImages($carId);
+            if ($carImages) {
+                foreach ($carImages as $image) {
+                    if (!empty($image['img']) && file_exists(ROOT_PATH . "/assets/images/cars/" . $image['img'])) {
+                        unlink(ROOT_PATH . "/assets/images/cars/" . $image['img']);
+                    }
+                    deleteCarImage($image['id']);
+                }
+            }
+
+            // 1.3 Удаляем все комментарии, оставленные ПОД этой машиной (любыми пользователями)
+            global $pdo;
+            $sql = "DELETE FROM comments WHERE page = :page";
+            $query = $pdo->prepare($sql);
+            $query->execute(['page' => $carId]);
+
+            // 1.4 Удаляем саму машину из БД
+            delete('cars', $carId);
+        }
+
+        // 2. Удаляем все комментарии, которые оставил САМ этот пользователь
+        if (!empty($user['email'])) {
+            global $pdo;
+            $sql = "DELETE FROM comments WHERE email = :email";
+            $query = $pdo->prepare($sql);
+            $query->execute(['email' => $user['email']]);
+        }
+
+        // 3. Удаляем самого пользователя
+        delete('users', $id);
+    }
+
     header('location: ' . BASE_URL . 'admin/users/index.php');
 }
 
-// Р Р•Р”РђРљРўРР РћР’РђРќРР• РџРћР›Р¬Р—РћР’РђРўР•Р›РЇ Р§Р•Р Р•Р— РђР”РњРРќРљРЈ
+// Р Р•Р”РђРљРўР˜Р РћР’РђРќР˜Р• РџРћР›Р¬Р—РћР’РђРўР•Р›РЇ Р§Р•Р Р•Р— РђР”РњР˜РќРљРЈ
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['edit_id'])) {
     $user = selectOne('users', ['id' => $_GET['edit_id']]);
 
@@ -136,32 +227,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['edit_id'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update-user'])) {
 
-    $id = $_POST['id'];
-    $mail = trim($_POST['mail']);
-    $login = trim($_POST['login']);
-    $passF = trim($_POST['pass-first']);
-    $passS = trim($_POST['pass-second']);
-    $admin = isset($_POST['admin']) ? 1 : 0;
-
-    if ($login === '') {
-        array_push($errMsg, "РќРµ РІСЃРµ РїРѕР»СЏ Р·Р°РїРѕР»РЅРµРЅС‹!");
-    } elseif (mb_strlen($login, 'UTF8') < 2) {
-        array_push($errMsg, "Р›РѕРіРёРЅ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±РѕР»РµРµ 2-С… СЃРёРјРІРѕР»РѕРІ");
-    } elseif ($passF !== $passS) {
-        array_push($errMsg, "РџР°СЂРѕР»Рё РІ РѕР±РµРёС… РїРѕР»СЏС… РґРѕР»Р¶РЅС‹ СЃРѕРѕС‚РІРµС‚СЃС‚РІРѕРІР°С‚СЊ!");
+    if (!validateCsrfToken($_POST)) {
+        array_push($errMsg, "Ошибка проверки безопасности (CSRF).");
     } else {
-        $pass = password_hash($passF, PASSWORD_DEFAULT);
-        if (isset($_POST['admin']))
-            $admin = 1;
-        $user = [
-            'admin' => $admin,
-            'username' => $login,
-            //            'email' => $mail,
-            'password' => $pass
-        ];
+        $id = $_POST['id'];
+        $mail = trim($_POST['mail']);
+        $login = trim($_POST['login']);
+        $passF = trim($_POST['pass-first']);
+        $passS = trim($_POST['pass-second']);
+        $admin = isset($_POST['admin']) ? 1 : 0;
 
-        $user = update('users', $id, $user);
-        header('location: ' . BASE_URL . 'admin/users/index.php');
+        if ($login === '') {
+            array_push($errMsg, "РќРµ РІСЃРµ РїРѕР»СЏ Р·Р°РїРѕР»РЅРµРЅС‹!");
+        } elseif (mb_strlen($login, 'UTF8') < 2) {
+            array_push($errMsg, "Р›РѕРіРёРЅ РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ Р±РѕР»РµРµ 2-С… СЃРёРјРІРѕР»РѕРІ");
+        } elseif ($passF !== $passS) {
+            array_push($errMsg, "РџР°СЂРѕР»Рё РІ РѕР±РµРёС… РїРѕР»СЏС… РґРѕР»Р¶РЅС‹ СЃРѕРѕС‚РІРµС‚СЃС‚РІРѕРІР°С‚СЊ!");
+        } else {
+            $pass = password_hash($passF, PASSWORD_DEFAULT);
+            if (isset($_POST['admin']))
+                $admin = 1;
+            $user = [
+                'admin' => $admin,
+                'username' => $login,
+                //            'email' => $mail,
+                'password' => $pass
+            ];
+
+            update('users', $id, $user);
+            header('location: ' . BASE_URL . 'admin/users/index.php');
+        }
     }
 } else {
     $id = isset($user) ? $user['id'] : '';
@@ -169,13 +264,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update-user'])) {
     $username = isset($user) ? $user['username'] : '';
     $email = isset($user) ? ($user['email'] ?? '') : '';
 }
-
-//if($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['pub_id'])){
-//    $id = $_GET['pub_id'];
-//    $publish = $_GET['publish'];
-//
-//    $postId = update('posts', $id, ['status' => $publish]);
-//
-//    header('location: ' . BASE_URL . 'admin/posts/index.php');
-//    exit();
-//}

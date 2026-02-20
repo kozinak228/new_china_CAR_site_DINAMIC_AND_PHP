@@ -14,6 +14,7 @@ include SITE_ROOT . "/app/controllers/users.php";
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <title>Добавить авто | ChinaCars</title>
 </head>
 
@@ -36,6 +37,7 @@ include SITE_ROOT . "/app/controllers/users.php";
             <?php endif; ?>
 
             <form action="create.php" method="post" enctype="multipart/form-data">
+                <?= csrfField() ?>
                 <div class="row">
                     <div class="mb-3 col-md-8">
                         <label class="form-label">Название авто *</label>
@@ -135,8 +137,14 @@ include SITE_ROOT . "/app/controllers/users.php";
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Главное фото</label>
-                    <input type="file" name="img" class="form-control" accept="image/*">
+                    <label class="form-label">Главное фото (выберите файл для обрезки)</label>
+                    <input type="file" id="imgInput" name="img" class="form-control" accept="image/*">
+                    <input type="hidden" name="cropped_img" id="cropped_img">
+                </div>
+
+                <div class="mb-3" id="cropper-container"
+                    style="display:none; max-width: 100%; height: 400px; background: #eee;">
+                    <img id="image-to-crop" src="" style="max-width: 100%;">
                 </div>
 
                 <div class="mb-3">
@@ -154,7 +162,8 @@ include SITE_ROOT . "/app/controllers/users.php";
                     <label class="form-check-label" for="featured">Показывать в карусели (лучшие предложения)</label>
                 </div>
 
-                <button type="submit" name="add_car" class="btn btn-success">
+                <input type="hidden" name="add_car" value="1">
+                <button type="submit" class="btn btn-success">
                     <i class="fas fa-plus"></i> Добавить авто
                 </button>
                 <a href="<?= BASE_URL ?>admin/cars/index.php" class="btn btn-secondary">Отмена</a>
@@ -163,6 +172,53 @@ include SITE_ROOT . "/app/controllers/users.php";
     </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script>
+        let cropper;
+        const imgInput = document.getElementById('imgInput');
+        const imageToCrop = document.getElementById('image-to-crop');
+        const cropperContainer = document.getElementById('cropper-container');
+        const croppedImgInput = document.getElementById('cropped_img');
+        const form = document.querySelector('form');
+
+        imgInput.addEventListener('change', function (e) {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+                const file = files[0];
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    imageToCrop.src = event.target.result;
+                    cropperContainer.style.display = 'block';
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+                    cropper = new Cropper(imageToCrop, {
+                        aspectRatio: 4 / 3,
+                        viewMode: 1,
+                        autoCropArea: 1,
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        form.addEventListener('submit', function (e) {
+            if (cropper) {
+                e.preventDefault();
+                const canvas = cropper.getCroppedCanvas({
+                    width: 800,
+                    height: 600,
+                });
+                croppedImgInput.value = canvas.toDataURL('image/jpeg', 0.7);
+                // очищаем оригинальный input file чтобы не отправлять большой файл
+                const dataTransfer = new DataTransfer();
+                imgInput.files = dataTransfer.files;
+                cropper.destroy();
+                cropper = null;
+                form.submit();
+            }
+        });
+    </script>
 </body>
 
 </html>

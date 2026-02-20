@@ -27,6 +27,14 @@ $totalPages = ceil($totalCars / $perPage);
 $featured = selectFeaturedCars(5);
 $brands = selectAll('brands');
 $bodyTypes = getBodyTypes();
+
+$user_favorites = [];
+if (isset($_SESSION['id'])) {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT id_car FROM favorites WHERE id_user = ?");
+    $stmt->execute([$_SESSION['id']]);
+    $user_favorites = $stmt->fetchAll(PDO::FETCH_COLUMN);
+}
 ?>
 <!doctype html>
 <html lang="ru">
@@ -82,7 +90,14 @@ $bodyTypes = getBodyTypes();
                         <?php foreach ($cars as $car): ?>
                             <div class="col-md-6 col-12 mb-4">
                                 <div class="car-card">
-                                    <div class="car-card-img">
+                                    <div class="car-card-img" style="position: relative;">
+                                        <?php if (isset($_SESSION['id'])): ?>
+                                            <button class="fav-btn" data-id="<?= $car['id'] ?>"
+                                                style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.7); border: none; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; font-size: 1.2rem; color: #ff4757; transition: 0.3s;">
+                                                <i
+                                                    class="<?= in_array($car['id'], $user_favorites) ? 'fas' : 'far' ?> fa-heart"></i>
+                                            </button>
+                                        <?php endif; ?>
                                         <?php if ($car['img']): ?>
                                             <a href="<?= BASE_URL ?>single.php?id=<?= $car['id'] ?>">
                                                 <img src="<?= BASE_URL ?>assets/images/cars/<?= $car['img'] ?>"
@@ -155,7 +170,7 @@ $bodyTypes = getBodyTypes();
                         <?php foreach ($brands as $i => $b): ?>
                             <li class="brand-item <?= $i >= 5 ? 'brand-hidden' : '' ?>"
                                 data-name="<?= mb_strtolower($b['name']) ?>">
-                                <a href="<?= BASE_URL ?>category.php?id=<?= $b['id'] ?>"><?= $b['name'] ?></a>
+                                <a href="<?= BASE_URL ?>index.php?brand=<?= $b['id'] ?>"><?= $b['name'] ?></a>
                             </li>
                         <?php endforeach; ?>
                     </ul>
