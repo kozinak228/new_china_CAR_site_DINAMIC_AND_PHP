@@ -63,3 +63,61 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const togglePasswordBtns = document.querySelectorAll('.toggle-password');
+        togglePasswordBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const input = document.querySelector(this.getAttribute('data-target'));
+                const icon = this.querySelector('i');
+                if (input) {
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                }
+            });
+        });
+
+        const favBtns = document.querySelectorAll('.fav-btn');
+        favBtns.forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const carId = this.getAttribute('data-id');
+                const icon = this.querySelector('i');
+
+                fetch('<?= BASE_URL ?>ajax_favorites.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ car_id: carId })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            if (data.action === 'added') {
+                                icon.classList.remove('far');
+                                icon.classList.add('fas');
+                            } else {
+                                icon.classList.remove('fas');
+                                icon.classList.add('far');
+                            }
+                        } else {
+                            if (data.message === 'Not authenticated') {
+                                alert('Для добавления в избранное необходимо авторизоваться!');
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+</script>

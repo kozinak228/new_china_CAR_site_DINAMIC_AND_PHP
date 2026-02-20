@@ -11,6 +11,14 @@ if (!$car) {
 $carImages = selectCarImages($id);
 $brands = selectAll('brands');
 
+$user_favorites = [];
+if (isset($_SESSION['id'])) {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT id_car FROM favorites WHERE id_user = ?");
+    $stmt->execute([$_SESSION['id']]);
+    $user_favorites = $stmt->fetchAll(PDO::FETCH_COLUMN);
+}
+
 // Подключаем контроллер комментариев для обработки POST
 include_once SITE_ROOT . "/app/controllers/commentaries.php";
 ?>
@@ -38,7 +46,12 @@ include_once SITE_ROOT . "/app/controllers/commentaries.php";
                 <h2><?= $car['title'] ?></h2>
 
                 <div class="single_post row">
-                    <div class="img col-12 mb-3">
+                    <div class="img col-12 mb-3" style="position: relative;">
+                        <?php if (isset($_SESSION['id'])): ?>
+                            <button class="fav-btn" data-id="<?= $car['id'] ?>" style="position: absolute; top: 15px; right: 30px; background: rgba(255,255,255,0.8); border: none; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; font-size: 1.6rem; color: #ff4757; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                <i class="<?= in_array($car['id'], $user_favorites) ? 'fas' : 'far' ?> fa-heart"></i>
+                            </button>
+                        <?php endif; ?>
                         <?php if ($car['img']): ?>
                             <img src="<?= BASE_URL . 'assets/images/cars/' . $car['img'] ?>" alt="<?= $car['title'] ?>"
                                 class="img-thumbnail w-100">

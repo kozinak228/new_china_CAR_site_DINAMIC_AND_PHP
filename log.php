@@ -33,11 +33,22 @@ include "app/controllers/users.php";
     <div class="container reg_form">
         <form class="row justify-content-center" method="post" action="log.php">
             <h2 class="col-12">Авторизация</h2>
-            <div class="mb-3 col-12 col-md-4 err">
-                <?php if (!empty($errMsg)):
-                    foreach ($errMsg as $e): ?>
-                        <p><?= $e ?></p><?php endforeach; endif; ?>
+            <div class="mb-3 col-12 col-md-4 err" id="errorBlock">
+                <?php
+                $blockedTimer = 0;
+                if (!empty($errMsg)):
+                    foreach ($errMsg as $e):
+                        if (strpos($e, 'BLOCKED_TIMER:') === 0) {
+                            $blockedTimer = (int) str_replace('BLOCKED_TIMER:', '', $e);
+                            echo "<p id='blockMessage' class='text-danger fw-bold'>Слишком много попыток входа.</p>";
+                        } else {
+                            echo "<p>$e</p>";
+                        }
+                    endforeach;
+                endif;
+                ?>
             </div>
+            <?= csrfField() ?>
             <div class="w-100"></div>
             <div class="mb-3 col-12 col-md-4">
                 <label for="formGroupExampleInput" class="form-label">Email</label>
@@ -47,13 +58,23 @@ include "app/controllers/users.php";
             <div class="w-100"></div>
             <div class="mb-3 col-12 col-md-4">
                 <label for="exampleInputPassword1" class="form-label">Пароль</label>
-                <input name="password" type="password" class="form-control" id="exampleInputPassword1"
-                    placeholder="введите ваш пароль...">
+                <div class="input-group">
+                    <input name="password" type="password" class="form-control" id="exampleInputPassword1"
+                        placeholder="введите ваш пароль...">
+                    <button class="btn btn-outline-secondary toggle-password" type="button"
+                        data-target="#exampleInputPassword1">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
             </div>
             <div class="w-100"></div>
             <div class="mb-3 col-12 col-md-4">
-                <button type="submit" name="button-log" class="btn btn-secondary">Войти</button>
-                <a href="<?= BASE_URL ?>reg.php">Зарегистрироваться</a>
+                <button type="submit" name="button-log" id="loginBtn"
+                    class="btn btn-secondary w-100 mb-2">Войти</button>
+                <div class="d-flex justify-content-between">
+                    <a href="<?= BASE_URL ?>reg.php">Зарегистрироваться</a>
+                    <a href="<?= BASE_URL ?>forgot.php" class="text-muted">Забыли пароль?</a>
+                </div>
             </div>
         </form>
     </div>
@@ -64,18 +85,42 @@ include "app/controllers/users.php";
     <!-- // footer -->
 
 
-    <!-- Optional JavaScript; choose one of the two! -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let timeLeft = <?= isset($blockedTimer) ? $blockedTimer : 0 ?>;
+        const msgBlock = document.getElementById('blockMessage');
+        const loginBtn = document.getElementById('loginBtn');
+        const inputs = document.querySelectorAll('#exampleInputEmail1, #exampleInputPassword1');
 
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
-        crossorigin="anonymous"></script>
+        if (timeLeft > 0) {
+            // Блокируем форму
+            loginBtn.disabled = true;
+            inputs.forEach(input => input.disabled = true);
 
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js" integrity="sha384-KsvD1yqQ1/1+IA7gi3P0tyJcT3vR+NdBTt13hSJ2lnve8agRGXTTyNaBYmCR/Nwi" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.min.js" integrity="sha384-nsg8ua9HAw1y0W1btsyWgBklPnCUAFLuTMS2G72MMONqmOymq585AcH49TLBQObG" crossorigin="anonymous"></script>
--->
+            const formatTime = (seconds) => {
+                const m = Math.floor(seconds / 60);
+                const s = seconds % 60;
+                return `${m}:${s < 10 ? '0' : ''}${s}`;
+            };
+
+            const timerText = document.createElement('span');
+            msgBlock.appendChild(document.createElement('br'));
+            msgBlock.appendChild(timerText);
+
+            const timerId = setInterval(() => {
+                timerText.innerHTML = `Попробуйте снова через: <b>${formatTime(timeLeft)}</b>`;
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    msgBlock.innerHTML = "Блокировка снята. Вы можете войти.";
+                    msgBlock.classList.remove('text-danger');
+                    msgBlock.classList.add('text-success');
+                    loginBtn.disabled = false;
+                    inputs.forEach(input => input.disabled = false);
+                }
+                timeLeft--;
+            }, 1000);
+        }
+    </script>
 </body>
 
 </html>

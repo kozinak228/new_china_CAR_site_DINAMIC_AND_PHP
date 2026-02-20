@@ -39,6 +39,7 @@ include "app/controllers/users.php";
                         <p><?= $e ?></p>
                     <?php endforeach; endif; ?>
             </div>
+            <?= csrfField() ?>
             <div class="w-100"></div>
             <div class="mb-3 col-12 col-md-4">
                 <label for="formGroupExampleInput" class="form-label">Ваш логин</label>
@@ -55,14 +56,26 @@ include "app/controllers/users.php";
             <div class="w-100"></div>
             <div class="mb-3 col-12 col-md-4">
                 <label for="exampleInputPassword1" class="form-label">Пароль</label>
-                <input name="pass-first" type="password" class="form-control" id="exampleInputPassword1"
-                    placeholder="введите ваш пароль...">
+                <div class="input-group">
+                    <input name="pass-first" type="password" class="form-control" id="exampleInputPassword1"
+                        placeholder="введите ваш пароль...">
+                    <button class="btn btn-outline-secondary toggle-password" type="button"
+                        data-target="#exampleInputPassword1">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
             </div>
             <div class="w-100"></div>
             <div class="mb-3 col-12 col-md-4">
                 <label for="exampleInputPassword2" class="form-label">Повторите пароль</label>
-                <input name="pass-second" type="password" class="form-control" id="exampleInputPassword2"
-                    placeholder="повторите ваш пароль...">
+                <div class="input-group">
+                    <input name="pass-second" type="password" class="form-control" id="exampleInputPassword2"
+                        placeholder="повторите ваш пароль...">
+                    <button class="btn btn-outline-secondary toggle-password" type="button"
+                        data-target="#exampleInputPassword2">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
             </div>
             <div class="w-100"></div>
             <div class="mb-3 col-12 col-md-4">

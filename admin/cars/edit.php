@@ -27,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <title>Редактировать авто | ChinaCars</title>
 </head>
 
@@ -51,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
             <?php endif; ?>
 
             <form action="edit.php" method="post" enctype="multipart/form-data">
+                <?= csrfField() ?>
                 <input type="hidden" name="id" value="<?= $car['id'] ?>">
                 <input type="hidden" name="current_img" value="<?= $car['img'] ?>">
 
@@ -164,26 +166,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Заменить главное фото</label>
-                    <input type="file" name="img" class="form-control" accept="image/*">
+                    <label class="form-label">Заменить главное фото (выберите файл для обрезки)</label>
+                    <input type="file" id="imgInput" name="img" class="form-control" accept="image/*">
+                    <input type="hidden" name="cropped_img" id="cropped_img">
+                </div>
+
+                <div class="mb-3" id="cropper-container"
+                    style="display:none; max-width: 100%; height: 400px; background: #eee;">
+                    <img id="image-to-crop" src="" style="max-width: 100%;">
                 </div>
 
                 <!-- Текущая галерея -->
                 <?php if (!empty($carImages)): ?>
                     <div class="mb-3">
-                        <label class="form-label">Фотогалерея</label>
-                        <div class="row">
+                        <label class="form-label">Фотогалерея (перетащите фото для изменения порядка)</label>
+                        <div class="row" id="sortableGallery" style="margin-left: -5px; margin-right: -5px;">
                             <?php foreach ($carImages as $image): ?>
-                                <div class="col-3 mb-2 text-center">
-                                    <img src="<?= BASE_URL ?>assets/images/cars/<?= $image['img'] ?>" class="img-thumbnail"
-                                        width="100" alt="">
-                                    <br>
-                                    <a href="<?= BASE_URL ?>admin/cars/index.php?del_img_id=<?= $image['id'] ?>&car_id=<?= $car['id'] ?>"
-                                        class="btn btn-sm btn-danger mt-1" onclick="return confirm('Удалить фото?')"><i
-                                            class="fas fa-trash"></i></a>
+                                <div class="col-6 col-md-3 mb-3 text-center gallery-item" data-id="<?= $image['id'] ?>"
+                                    style="cursor: grab; padding: 5px;">
+                                    <div class="card h-100 p-2 shadow-sm"
+                                        style="background-color: var(--card-bg); border-color: var(--border-color);">
+                                        <img src="<?= BASE_URL ?>assets/images/cars/<?= $image['img'] ?>"
+                                            class="img-fluid rounded mb-2" alt=""
+                                            style="object-fit: cover; height: 120px; width: 100%;">
+                                        <a href="<?= BASE_URL ?>admin/cars/index.php?del_img_id=<?= $image['id'] ?>&car_id=<?= $car['id'] ?>"
+                                            class="btn btn-sm btn-danger mt-auto mx-auto w-75"
+                                            onclick="return confirm('Удалить фото?')"><i class="fas fa-trash"></i> Удалить</a>
+                                    </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
+                        <div id="sortErrorBlock" class="text-danger mt-2" style="display: none;"></div>
                     </div>
                 <?php endif; ?>
 
@@ -203,7 +216,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
                     <label class="form-check-label" for="featured">Показывать в карусели (лучшие предложения)</label>
                 </div>
 
-                <button type="submit" name="edit_car" class="btn btn-primary">
+                <input type="hidden" name="edit_car" value="1">
+                <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Сохранить
                 </button>
                 <a href="<?= BASE_URL ?>admin/cars/index.php" class="btn btn-secondary">Отмена</a>
@@ -212,6 +226,93 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
     </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script>
+        // Sortable Gallery
+        const sortableGallery = document.getElementById('sortableGallery');
+        if (sortableGallery) {
+            new Sortable(sortableGallery, {
+                animation: 150,
+                ghostClass: 'bg-light',
+                onEnd: function () {
+                    const itemEls = sortableGallery.querySelectorAll('.gallery-item');
+                    let order = [];
+                    itemEls.forEach((el, index) => {
+                        order.push({
+                            id: el.getAttribute('data-id'),
+                            sort_order: index
+                        });
+                    });
+
+                    // AJAX для сохранения сортировки
+                    fetch('<?= BASE_URL ?>admin/cars/ajax_sort_gallery.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ order: order })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (!data.success) {
+                                const errBlock = document.getElementById('sortErrorBlock');
+                                errBlock.textContent = "Ошибка при сохранении порядка: " + (data.error || 'Неизвестная ошибка');
+                                errBlock.style.display = 'block';
+                                setTimeout(() => errBlock.style.display = 'none', 3000);
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                }
+            });
+        }
+
+        // Cropper
+        let cropper;
+        const imgInput = document.getElementById('imgInput');
+        const imageToCrop = document.getElementById('image-to-crop');
+        const cropperContainer = document.getElementById('cropper-container');
+        const croppedImgInput = document.getElementById('cropped_img');
+        const form = document.querySelector('form');
+
+        imgInput.addEventListener('change', function (e) {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+                const file = files[0];
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    imageToCrop.src = event.target.result;
+                    cropperContainer.style.display = 'block';
+                    if (cropper) {
+                        cropper.destroy();
+                    }
+                    cropper = new Cropper(imageToCrop, {
+                        aspectRatio: 4 / 3,
+                        viewMode: 1,
+                        autoCropArea: 1,
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        form.addEventListener('submit', function (e) {
+            if (cropper) {
+                e.preventDefault();
+                const canvas = cropper.getCroppedCanvas({
+                    width: 800,
+                    height: 600,
+                });
+                croppedImgInput.value = canvas.toDataURL('image/jpeg', 0.7);
+                // очищаем оригинальный input file чтобы не отправлять большой файл
+                const dataTransfer = new DataTransfer();
+                imgInput.files = dataTransfer.files;
+                cropper.destroy();
+                cropper = null;
+                form.submit();
+            }
+        });
+    </script>
 </body>
 
 </html>

@@ -7,11 +7,11 @@ if (!isset($_GET['id'])) {
     exit();
 }
 
+// Редирект на index.php где есть фильтры
+header('location: ' . BASE_URL . 'index.php?brand=' . $_GET['id']);
+exit();
+
 $brandInfo = selectOne('brands', ['id' => $_GET['id']]);
-if (!$brandInfo) {
-    header('location: ' . BASE_URL);
-    exit();
-}
 
 $cars = selectAll('cars', ['id_brand' => $_GET['id'], 'status' => 1]);
 $brands = selectAll('brands');
