@@ -1,12 +1,28 @@
 <header class="container-fluid">
     <div class="container">
         <div class="row">
-            <div class="col-4">
+            <div class="col-lg-3 col-md-4 col-12">
                 <h1>
                     <a href="<?php echo BASE_URL ?>"><i class="fas fa-car"></i> ChinaCars</a>
                 </h1>
             </div>
-            <nav class="col-8">
+            <div class="col-lg-5 col-md-4 col-12 d-flex align-items-center">
+                <div class="search-container w-100 mt-2 mt-md-0">
+                    <form action="<?= BASE_URL ?>search.php" method="post" id="headerSearchForm" autocomplete="off">
+                        <div class="input-group">
+                            <input type="text" name="search-term" id="headerSearchInput" class="form-control"
+                                placeholder="Поиск авто (марка, модель...)"
+                                style="border-radius: 20px 0 0 20px; border-right: none;">
+                            <button class="btn btn-outline-light" type="submit"
+                                style="border-radius: 0 20px 20px 0; border-left: none; background: rgba(255,255,255,0.1);">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <div id="search-results"></div>
+                </div>
+            </div>
+            <nav class="col-lg-4 col-md-4 col-12">
                 <ul>
                     <li><a href="<?php echo BASE_URL ?>">Каталог</a></li>
                     <li><a href="<?php echo BASE_URL . 'gallery.php' ?>">Галерея</a></li>
