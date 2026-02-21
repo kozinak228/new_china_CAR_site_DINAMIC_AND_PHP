@@ -120,4 +120,84 @@
             });
         });
     });
+    // AJAX LIVE SEARCH
+    const searchInput = document.getElementById('headerSearchInput');
+    const searchResults = document.getElementById('search-results');
+    let debounceTimer;
+
+    if (searchInput && searchResults) {
+        searchInput.addEventListener('input', function () {
+            const term = this.value.trim();
+            clearTimeout(debounceTimer);
+
+            if (term.length < 2) {
+                searchResults.style.display = 'none';
+                searchResults.innerHTML = '';
+                return;
+            }
+
+            debounceTimer = setTimeout(() => {
+                fetch('<?= BASE_URL ?>ajax_search.php?term=' + encodeURIComponent(term))
+                    .then(response => response.json())
+                    .then(data => {
+                        searchResults.innerHTML = '';
+                        if (data.items && data.items.length > 0) {
+                            data.items.forEach(car => {
+                                const item = document.createElement('a');
+                                item.href = car.url;
+                                item.className = 'search-result-item';
+
+                                const imgHTML = car.img
+                                    ? `<img src="${car.img}" class="search-result-img" alt="">`
+                                    : `<div class="search-result-img d-flex align-items-center justify-content-center"><i class="fas fa-car text-muted"></i></div>`;
+
+                                item.innerHTML = `
+                                    ${imgHTML}
+                                    <div class="search-result-info">
+                                        <span class="search-result-title">${car.title}</span>
+                                        <span class="search-result-meta">${car.brand}</span>
+                                    </div>
+                                    <div class="search-result-price">${car.price}</div>
+                                `;
+                                searchResults.appendChild(item);
+                            });
+
+                            if (data.total > data.items.length) {
+                                const allLink = document.createElement('a');
+                                allLink.href = '#';
+                                allLink.className = 'search-result-item justify-content-center fw-bold';
+                                allLink.style.color = '#e94560';
+                                allLink.innerHTML = `Показать все результаты (${data.total})`;
+                                allLink.onclick = (e) => {
+                                    e.preventDefault();
+                                    document.getElementById('headerSearchForm').submit();
+                                };
+                                searchResults.appendChild(allLink);
+                            }
+                            searchResults.style.display = 'block';
+                        } else {
+                            searchResults.innerHTML = '<div class="search-no-results">Ничего не найдено</div>';
+                            searchResults.style.display = 'block';
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Search error:', err);
+                    });
+            }, 300); // 300ms debounce
+        });
+
+        // Закрытие при клике вне области
+        document.addEventListener('click', function (e) {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        // Показ при фокусе, если есть текст
+        searchInput.addEventListener('focus', function () {
+            if (this.value.trim().length >= 2 && searchResults.innerHTML !== '') {
+                searchResults.style.display = 'block';
+            }
+        });
+    }
 </script>
