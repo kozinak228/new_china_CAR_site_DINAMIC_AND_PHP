@@ -37,244 +37,402 @@ if (isset($_SESSION['id'])) {
 }
 ?>
 <!doctype html>
-<html lang="ru">
+<html lang="ru" class="<?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark' : '' ?>">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ChinaCars &mdash; Каталог автомобилей из Китая</title>
+
+    <!-- Tailwind CSS (Stitch Integration) -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#e11d48", // Vibrant Red
+                        "background-light": "#f8fafc",
+                        "background-dark": "#0f172a",
+                        accent: "#3b82f6", // Vibrant Blue
+                    },
+                    fontFamily: {
+                        display: ["Outfit", "sans-serif"],
+                        sans: ["Outfit", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.75rem",
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                },
+            },
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <title>ChinaCars &mdash; Каталог автомобилей из Китая</title>
 </head>
 
-<body class="<?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark-theme' : '' ?>">
+<body
+    class="bg-slate-50 dark:bg-background-dark text-slate-900 dark:text-slate-100 <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark-theme' : '' ?>">
 
     <?php include("app/include/header.php"); ?>
 
-    <div class="container">
-        <?php if (count($featured) > 0 && $page == 1 && empty($filters)): ?>
-            <h2 class="slider-title">Лучшие предложения</h2>
-            <div id="carCarousel" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    <?php foreach ($featured as $key => $f): ?>
-                        <div class="carousel-item <?= $key === 0 ? 'active' : '' ?>">
-                            <?php if ($f['img']): ?>
-                                <img src="<?= BASE_URL ?>assets/images/cars/<?= $f['img'] ?>" class="d-block w-100"
-                                    alt="<?= $f['title'] ?>">
-                            <?php else: ?>
-                                <div class="car-no-img-big"><i class="fas fa-car fa-5x"></i></div>
-                            <?php endif; ?>
-                            <div class="carousel-caption carousel-caption-hack">
-                                <h5><a href="<?= BASE_URL ?>single.php?id=<?= $f['id'] ?>"><?= $f['title'] ?></a></h5>
+    <?php if (count($featured) > 0 && $page == 1 && empty($filters)): ?>
+        <section class="max-w-7xl mx-auto px-4 mt-28 mb-8">
+            <div id="heroCarousel" class="carousel slide !h-auto" data-bs-ride="carousel">
+                <div class="carousel-inner !h-auto rounded-3xl overflow-hidden shadow-2xl">
+                    <?php foreach ($featured as $index => $hero): ?>
+                        <div class="carousel-item !h-auto <?= $index === 0 ? 'active' : '' ?>">
+                            <div class="relative h-[500px] md:h-[600px] w-full">
+                                <?php if ($hero['img']): ?>
+                                    <img alt="<?= htmlspecialchars($hero['title']) ?>" class="w-full h-full object-cover"
+                                        src="<?= BASE_URL ?>assets/images/cars/<?= $hero['img'] ?>" />
+                                <?php else: ?>
+                                    <div class="w-full h-full bg-slate-800 flex items-center justify-center"><i
+                                            class="fas fa-car fa-5x text-slate-500"></i></div>
+                                <?php endif; ?>
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none z-0">
+                                </div>
+                                <div class="absolute inset-x-0 bottom-0 p-12 text-white z-10 pointer-events-none">
+                                    <div class="pointer-events-auto relative inline-block">
+                                        <span
+                                            class="inline-flex items-center justify-center px-5 py-1.5 rounded-full bg-[#991b1b] text-white border-2 border-white/50 text-[11px] font-bold tracking-[0.1em] uppercase mb-4 shadow-lg leading-none drop-shadow-md"
+                                            style="height: 32px; padding-top: 2px;">Спецпредложение</span>
+                                        <h2 class="text-4xl md:text-5xl font-bold mb-2 drop-shadow-xl">
+                                            <?= htmlspecialchars($hero['title']) ?>
+                                        </h2>
+                                        <p class="text-xl text-slate-300 mb-6 drop-shadow-md">Цена от
+                                            <?= number_format($hero['price'], 0, '', ' ') ?> ₽
+                                        </p>
+                                        <a href="<?= BASE_URL ?>single.php?id=<?= $hero['id'] ?>"
+                                            class="magnetic-btn inline-flex items-center bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-full font-bold shadow-lg shadow-primary/20 transition-all drop-shadow-md cursor-pointer"
+                                            style="text-decoration:none;">
+                                            Подробнее <span class="material-icons ml-2">arrow_forward</span>
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#carCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon"></span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon"></span>
-                </button>
+                <?php if (count($featured) > 1): ?>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Предыдущий</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Следующий</span>
+                    </button>
+                <?php endif; ?>
             </div>
-        <?php endif; ?>
+        </section>
+    <?php endif; ?>
 
-        <div class="row mt-4">
-            <div class="main-content col-md-9 col-12">
-                <h2>Каталог автомобилей</h2>
-                <div class="row">
-                    <?php if (count($cars) > 0): ?>
-                        <?php foreach ($cars as $car): ?>
-                            <div class="col-md-6 col-12 mb-4">
-                                <div class="car-card">
-                                    <div class="car-card-img" style="position: relative;">
-                                        <?php if (isset($_SESSION['id'])): ?>
-                                            <button class="fav-btn" data-id="<?= $car['id'] ?>"
-                                                style="position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.7); border: none; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; font-size: 1.2rem; color: #ff4757; transition: 0.3s;">
-                                                <i
-                                                    class="<?= in_array($car['id'], $user_favorites) ? 'fas' : 'far' ?> fa-heart"></i>
-                                            </button>
-                                        <?php endif; ?>
-                                        <?php if ($car['img']): ?>
-                                            <a href="<?= BASE_URL ?>single.php?id=<?= $car['id'] ?>">
-                                                <img src="<?= BASE_URL ?>assets/images/cars/<?= $car['img'] ?>"
-                                                    alt="<?= $car['title'] ?>">
-                                            </a>
-                                        <?php else: ?>
-                                            <div class="car-no-img"><i class="fas fa-car fa-3x"></i></div>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div class="car-card-body">
-                                        <span class="car-brand-badge"><?= $car['brand_name'] ?></span>
-                                        <h5><a href="<?= BASE_URL ?>single.php?id=<?= $car['id'] ?>"><?= $car['title'] ?></a>
-                                        </h5>
-                                        <div class="car-specs">
-                                            <span><i class="fas fa-calendar"></i> <?= $car['year'] ?></span>
-                                            <span><i class="fas fa-cog"></i> <?= $car['engine_volume'] ?>&#1083; /
-                                                <?= $car['horsepower'] ?> &#1083;.&#1089;.</span>
-                                            <span><i class="fas fa-road"></i> <?= $car['body_type'] ?></span>
-                                        </div>
-                                        <div class="car-price">
-                                            <?= number_format($car['price'], 0, '', ' ') ?> &#8381;
+    <main
+        class="max-w-7xl mx-auto px-4 py-16 flex flex-col lg:flex-row gap-8 <?= ($page != 1 || !empty($filters)) ? 'mt-20' : '' ?>">
+        <!-- Фильтры (Sidebar) -->
+        <aside class="w-full lg:w-1/4 space-y-6">
+            <div class="glass dark:bg-slate-800/40 p-6 rounded-2xl sticky top-28">
+                <h3 class="text-xl font-bold mb-6 flex items-center text-slate-900 dark:text-white">
+                    <span class="material-icons mr-2 text-primary">tune</span> Фильтры
+                </h3>
+                <form action="index.php" method="get" class="space-y-6">
+                    <div class="border-b border-slate-200 dark:border-white/10 pb-4">
+                        <label
+                            class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2 block">Бренд</label>
+                        <select name="brand" <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'style="color-scheme: dark;"' : '' ?>
+                            class="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-lg p-3 text-sm focus:ring-primary transition-all text-slate-800 dark:text-white outline-none">
+                            <option value="">Все бренды</option>
+                            <?php foreach ($brands as $b): ?>
+                                <option value="<?= $b['id'] ?>" <?= ($brand_id == $b['id']) ? 'selected' : '' ?>>
+                                    <?= $b['name'] ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="border-b border-slate-200 dark:border-white/10 pb-4">
+                        <label
+                            class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2 block">Тип
+                            кузова</label>
+                        <select name="body_type" <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'style="color-scheme: dark;"' : '' ?>
+                            class="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-lg p-3 text-sm focus:ring-primary transition-all text-slate-800 dark:text-white outline-none">
+                            <option value="">Все</option>
+                            <?php foreach ($bodyTypes as $bt): ?>
+                                <option value="<?= $bt ?>" <?= ($body_type == $bt) ? 'selected' : '' ?>><?= $bt ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="space-y-3">
+                        <label
+                            class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Цена
+                            (₽)</label>
+                        <div class="flex items-center space-x-2">
+                            <input name="price_min" value="<?= $price_min ?>"
+                                class="w-1/2 bg-slate-100 dark:bg-slate-900 border-none rounded-lg p-2 text-sm text-slate-800 dark:text-white outline-none focus:ring-1 focus:ring-primary"
+                                placeholder="От" type="number" min="0" />
+                            <input name="price_max" value="<?= $price_max ?>"
+                                class="w-1/2 bg-slate-100 dark:bg-slate-900 border-none rounded-lg p-2 text-sm text-slate-800 dark:text-white outline-none focus:ring-1 focus:ring-primary"
+                                placeholder="До" type="number" min="0" />
+                        </div>
+                    </div>
+
+                    <button type="submit"
+                        class="magnetic-btn w-full bg-primary py-3 rounded-xl font-bold shadow-lg shadow-primary/20 text-white border-none cursor-pointer">Применить</button>
+                    <?php if (!empty($filters)): ?>
+                        <a href="index.php"
+                            class="block text-center mt-3 text-sm text-slate-500 hover:text-primary transition-colors"
+                            style="text-decoration:none;">Сбросить фильтры</a>
+                    <?php endif; ?>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Каталог -->
+        <section class="w-full lg:w-3/4">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-3xl font-bold text-slate-900 dark:text-white">Автомобили в наличии</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <?php if (count($cars) > 0): ?>
+                    <?php foreach ($cars as $car): ?>
+                        <div
+                            class="tilt-card glass dark:bg-slate-800/40 rounded-2xl overflow-hidden group relative bg-[#fff] dark:bg-transparent border border-slate-200 dark:border-white/10">
+                            <div class="relative h-64 overflow-hidden bg-slate-200 dark:bg-slate-900">
+                                <?php if ($car['img']): ?>
+                                    <a href="<?= BASE_URL ?>single.php?id=<?= $car['id'] ?>">
+                                        <img alt="<?= $car['title'] ?>"
+                                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                            src="<?= BASE_URL ?>assets/images/cars/<?= $car['img'] ?>" />
+                                    </a>
+                                <?php else: ?>
+                                    <a href="<?= BASE_URL ?>single.php?id=<?= $car['id'] ?>"
+                                        class="w-full h-full flex items-center justify-center text-slate-400"
+                                        style="text-decoration:none;">
+                                        <i class="fas fa-car fa-4x"></i>
+                                    </a>
+                                <?php endif; ?>
+
+                                <div class="absolute top-4 left-4 flex space-x-2">
+                                    <span
+                                        class="px-3 py-1 bg-primary text-white text-[10px] font-bold rounded uppercase"><?= $car['brand_name'] ?></span>
+                                </div>
+
+                                <?php if (isset($_SESSION['id'])): ?>
+                                    <button
+                                        class="fav-btn absolute top-4 right-4 w-10 h-10 rounded-full glass hover:bg-white/20 transition-colors border-none cursor-pointer flex items-center justify-center z-20 pointer-events-auto"
+                                        data-id="<?= $car['id'] ?>" title="В избранное">
+                                        <i
+                                            class="<?= in_array($car['id'], $user_favorites) ? 'fas text-primary' : 'far text-white' ?> fa-heart text-xl transition-colors"></i>
+                                    </button>
+                                <?php endif; ?>
+
+                                <?php
+                                $compareList = isset($_SESSION['compare']) ? $_SESSION['compare'] : [];
+                                $inCompare = in_array($car['id'], $compareList);
+                                $compareTopPos = isset($_SESSION['id']) ? 'top-16' : 'top-4';
+                                ?>
+                                <button
+                                    class="compare-btn absolute <?= $compareTopPos ?> right-4 w-10 h-10 rounded-full glass <?= $inCompare ? 'bg-primary' : 'hover:bg-primary' ?> transition-colors border-none cursor-pointer flex items-center justify-center z-10"
+                                    data-id="<?= $car['id'] ?>" title="К сравнению">
+                                    <span class="material-icons text-white text-[20px]">balance</span>
+                                </button>
+
+                                <div
+                                    class="absolute inset-0 bg-slate-900/80 p-6 flex flex-col justify-end spec-fade pointer-events-none">
+                                    <div class="grid grid-cols-2 gap-4 text-xs text-white dark:text-slate-300">
+                                        <div class="flex items-center space-x-2"><span
+                                                class="material-icons text-primary text-sm">calendar_today</span><span><?= $car['year'] ?>
+                                                г.</span></div>
+                                        <div class="flex items-center space-x-2"><span
+                                                class="material-icons text-primary text-sm">speed</span><span><?= $car['horsepower'] ?>
+                                                л.с.</span></div>
+                                        <div class="flex items-center space-x-2"><span
+                                                class="material-icons text-primary text-sm">settings</span><span><?= $car['engine_volume'] ?>
+                                                л.</span></div>
+                                        <div class="flex items-center space-x-2"><span
+                                                class="material-icons text-primary text-sm">directions_car</span><span><?= $car['body_type'] ?></span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <p>Автомобили не найдены</p>
-                    <?php endif; ?>
-                </div>
-
-                <?php if ($totalPages > 1): ?>
-                    <nav>
-                        <ul class="pagination justify-content-center">
-                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                <?php
-                                $params = ['page' => $i];
-                                if ($brand_id)
-                                    $params['brand'] = $brand_id;
-                                if ($body_type)
-                                    $params['body_type'] = $body_type;
-                                if ($price_min)
-                                    $params['price_min'] = $price_min;
-                                if ($price_max)
-                                    $params['price_max'] = $price_max;
-                                ?>
-                                <li class="page-item <?= $i == $page ? 'active' : '' ?>">
-                                    <a class="page-link" href="?<?= http_build_query($params) ?>"><?= $i ?></a>
-                                </li>
-                            <?php endfor; ?>
-                        </ul>
-                    </nav>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold mb-1 text-slate-900 dark:text-white">
+                                    <a href="<?= BASE_URL ?>single.php?id=<?= $car['id'] ?>"
+                                        style="text-decoration:none; color:inherit;"><?= $car['title'] ?></a>
+                                </h3>
+                                <div class="flex items-end justify-between mt-4">
+                                    <div>
+                                        <span class="text-slate-500 text-xs block mb-1">Цена от</span>
+                                        <span
+                                            class="text-2xl font-bold text-primary"><?= number_format($car['price'], 0, '', ' ') ?>
+                                            ₽</span>
+                                    </div>
+                                    <a href="<?= BASE_URL ?>single.php?id=<?= $car['id'] ?>"
+                                        class="material-icons text-slate-400 group-hover:text-primary transition-colors"
+                                        style="text-decoration:none;">arrow_forward</a>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="col-span-full text-center py-10 text-slate-500 dark:text-slate-400">
+                        <i class="fas fa-search fa-3x mb-3 text-slate-300 dark:text-slate-600"></i>
+                        <p>По вашему запросу автомобили не найдены.</p>
+                    </div>
                 <?php endif; ?>
             </div>
 
-            <div class="sidebar col-md-3 col-12">
-                <div class="section search">
-                    <h3>Поиск</h3>
-                    <form action="search.php" method="post">
-                        <input type="text" name="search-term" class="text-input" placeholder="Марка, модель...">
-                    </form>
-                </div>
+            <?php if ($totalPages > 1): ?>
+                <div class="mt-12 flex items-center justify-center space-x-2">
+                    <?php
+                    $range = 2;
+                    $pages_to_show = [];
+                    if ($totalPages <= 7) {
+                        for ($i = 1; $i <= $totalPages; $i++)
+                            $pages_to_show[] = $i;
+                    } else {
+                        $pages_to_show[] = 1;
+                        $start = max(2, $page - $range);
+                        $end = min($totalPages - 1, $page + $range);
+                        if ($start > 2)
+                            $pages_to_show[] = '...';
+                        for ($i = $start; $i <= $end; $i++)
+                            $pages_to_show[] = $i;
+                        if ($end < $totalPages - 1)
+                            $pages_to_show[] = '...';
+                        $pages_to_show[] = $totalPages;
+                    }
 
-                <div class="section topics brands-section">
-                    <h3 class="brands-toggle" onclick="toggleBrands()">Бренды <span id="brands-arrow">▼</span></h3>
-                    <input type="text" id="brand-search" class="brand-search-input" placeholder="Поиск бренда..."
-                        oninput="filterBrands()">
-                    <ul id="brands-list">
-                        <li><a href="<?= BASE_URL ?>">Все бренды</a></li>
-                        <?php foreach ($brands as $i => $b): ?>
-                            <li class="brand-item <?= $i >= 5 ? 'brand-hidden' : '' ?>"
-                                data-name="<?= mb_strtolower($b['name']) ?>">
-                                <a href="<?= BASE_URL ?>index.php?brand=<?= $b['id'] ?>"><?= $b['name'] ?></a>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <?php if (count($brands) > 5): ?>
-                        <button type="button" class="btn btn-sm btn-outline-secondary w-100 mt-2" id="brands-show-all"
-                            onclick="showAllBrands()">Показать все (<?= count($brands) ?>)</button>
+                    // Base params helper
+                    $getBaseParams = function ($p) use ($brand_id, $body_type, $price_min, $price_max) {
+                        $pa = ['page' => $p];
+                        if ($brand_id)
+                            $pa['brand'] = $brand_id;
+                        if ($body_type)
+                            $pa['body_type'] = $body_type;
+                        if ($price_min)
+                            $pa['price_min'] = $price_min;
+                        if ($price_max)
+                            $pa['price_max'] = $price_max;
+                        return $pa;
+                    };
+
+                    // Previous Button
+                    if ($page > 1): ?>
+                        <a href="?<?= http_build_query($getBaseParams($page - 1)) ?>"
+                            class="w-10 h-10 rounded-lg glass text-slate-700 dark:text-slate-400 hover:bg-primary hover:text-white flex items-center justify-center transition-all border border-slate-200 dark:border-white/10"
+                            style="text-decoration:none;">
+                            <span class="material-icons text-xl">chevron_left</span>
+                        </a>
+                    <?php endif;
+
+                    foreach ($pages_to_show as $p):
+                        if ($p === '...'): ?>
+                            <span class="w-8 h-10 flex items-center justify-center text-slate-400">...</span>
+                        <?php else:
+                            $params = $getBaseParams($p);
+                            $activeClass = ($p == $page) ? 'bg-primary text-white border-primary shadow-lg shadow-primary/25' : 'glass text-slate-700 dark:text-slate-400 hover:bg-primary hover:text-white hover:border-primary border-slate-200 dark:border-white/10';
+                            ?>
+                            <a href="?<?= http_build_query($params) ?>"
+                                class="w-10 h-10 rounded-lg <?= $activeClass ?> flex items-center justify-center transition-all font-bold"
+                                style="text-decoration:none; border-width:1px; border-style:solid;">
+                                <?= $p ?>
+                            </a>
+                        <?php endif;
+                    endforeach;
+
+                    // Next Button
+                    if ($page < $totalPages): ?>
+                        <a href="?<?= http_build_query($getBaseParams($page + 1)) ?>"
+                            class="w-10 h-10 rounded-lg glass text-slate-700 dark:text-slate-400 hover:bg-primary hover:text-white flex items-center justify-center transition-all border border-slate-200 dark:border-white/10"
+                            style="text-decoration:none;">
+                            <span class="material-icons text-xl">chevron_right</span>
+                        </a>
                     <?php endif; ?>
                 </div>
+            <?php endif; ?>
+        </section>
+    </main>
 
-                <div class="section">
-                    <h3>Фильтры</h3>
-                    <form action="index.php" method="get">
-                        <div class="mb-2">
-                            <label class="form-label">Тип кузова</label>
-                            <select name="body_type" class="form-select form-select-sm">
-                                <option value="">Все</option>
-                                <?php foreach ($bodyTypes as $bt): ?>
-                                    <option value="<?= $bt ?>" <?= ($body_type == $bt) ? 'selected' : '' ?>><?= $bt ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">Цена от</label>
-                            <input type="number" name="price_min" class="form-control form-control-sm"
-                                value="<?= $price_min ?>" placeholder="от" min="0">
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">Цена до</label>
-                            <input type="number" name="price_max" class="form-control form-control-sm"
-                                value="<?= $price_max ?>" placeholder="до" min="0">
-                        </div>
-                        <button type="submit" class="btn btn-sm btn-secondary w-100 mt-2">Применить</button>
-                    </form>
-                </div>
+    <section
+        class="py-20 bg-slate-100 dark:bg-slate-900 relative overflow-hidden mt-8 border-y border-slate-200 dark:border-white/10">
+        <div class="absolute inset-0 opacity-20 pointer-events-none">
+            <div class="absolute top-0 left-1/4 w-96 h-96 bg-primary/30 rounded-full blur-[120px] animate-pulse-slow">
+            </div>
+            <div
+                class="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/30 rounded-full blur-[120px] animate-pulse-slow">
             </div>
         </div>
-    </div>
+        <div class="max-w-7xl mx-auto px-4 relative z-10 text-center flex flex-col items-center">
+            <h2 class="text-4xl font-bold mb-6 text-slate-900 dark:text-white">Управляйте будущим уже сегодня</h2>
+            <p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-10">Наш шоурум предлагает самый широкий
+                выбор высокотехнологичных китайских автомобилей. Откройте для себя новые стандарты.</p>
+            <a href="<?= BASE_URL ?>#catalog" style="text-decoration: none;"
+                class="magnetic-btn bg-slate-900 dark:bg-white !text-white dark:!text-slate-900 px-10 py-4.5 rounded-full font-bold text-lg hover:shadow-2xl transition-all border-none flex items-center justify-center min-w-[300px]">
+                К каталогу автомобилей
+            </a>
+        </div>
+    </section>
 
-    <?php include("app/include/footer.php"); ?>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
-        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let brandsExpanded = false;
-        let brandsCollapsed = false;
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.compare-btn').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const carId = this.dataset.id;
+                    const isAdded = this.classList.contains('bg-primary');
+                    const action = isAdded ? 'remove' : 'add';
 
-        function toggleBrands() {
-            const list = document.getElementById('brands-list');
-            const arrow = document.getElementById('brands-arrow');
-            const search = document.getElementById('brand-search');
-            const showAllBtn = document.getElementById('brands-show-all');
-            brandsCollapsed = !brandsCollapsed;
-            if (brandsCollapsed) {
-                list.style.display = 'none';
-                search.style.display = 'none';
-                if (showAllBtn) showAllBtn.style.display = 'none';
-                arrow.textContent = '▶';
-            } else {
-                list.style.display = '';
-                search.style.display = '';
-                if (showAllBtn) showAllBtn.style.display = '';
-                arrow.textContent = '▼';
-            }
-        }
+                    fetch('<?= BASE_URL ?>ajax_compare.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: action, car_id: carId })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                const badge = document.getElementById('compareBadge');
+                                if (badge) {
+                                    badge.textContent = data.count;
+                                    if (data.count > 0) {
+                                        badge.classList.remove('hidden');
+                                    } else {
+                                        badge.classList.add('hidden');
+                                    }
+                                }
 
-        function showAllBrands() {
-            const items = document.querySelectorAll('.brand-item');
-            const btn = document.getElementById('brands-show-all');
-            brandsExpanded = !brandsExpanded;
-            items.forEach(item => {
-                if (brandsExpanded) {
-                    item.classList.remove('brand-hidden');
-                } else {
-                    // Скрыть обратно элементы с индексом >= 5
-                    const allItems = Array.from(document.querySelectorAll('.brand-item'));
-                    const idx = allItems.indexOf(item);
-                    if (idx >= 5) item.classList.add('brand-hidden');
-                }
+                                if (data.is_added) {
+                                    this.classList.remove('hover:bg-primary');
+                                    this.classList.add('bg-primary');
+                                } else {
+                                    this.classList.add('hover:bg-primary');
+                                    this.classList.remove('bg-primary');
+                                }
+                            } else {
+                                alert(data.message);
+                            }
+                        })
+                        .catch(err => console.error('Error:', err));
+                });
             });
-            btn.textContent = brandsExpanded ? 'Свернуть' : 'Показать все (' + document.querySelectorAll('.brand-item').length + ')';
-        }
-
-        function filterBrands() {
-            const query = document.getElementById('brand-search').value.toLowerCase();
-            const items = document.querySelectorAll('.brand-item');
-            const btn = document.getElementById('brands-show-all');
-            items.forEach(item => {
-                const name = item.getAttribute('data-name');
-                if (query === '') {
-                    // Вернуть начальное состояние
-                    if (!brandsExpanded) {
-                        const allItems = Array.from(document.querySelectorAll('.brand-item'));
-                        const idx = allItems.indexOf(item);
-                        item.style.display = idx >= 5 ? 'none' : '';
-                    } else {
-                        item.style.display = '';
-                    }
-                } else {
-                    item.style.display = name.includes(query) ? '' : 'none';
-                }
-            });
-            if (btn) btn.style.display = query ? 'none' : '';
-        }
+        });
     </script>
+    <?php include("app/include/footer.php"); ?>
 </body>
 
 </html>

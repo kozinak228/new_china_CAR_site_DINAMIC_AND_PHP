@@ -23,162 +23,327 @@ if (isset($_SESSION['id'])) {
 include_once SITE_ROOT . "/app/controllers/commentaries.php";
 ?>
 <!doctype html>
-<html lang="ru">
+<html lang="ru" class="<?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark' : '' ?>">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><?= $car['title'] ?> &mdash; ChinaCars</title>
+
+    <!-- Tailwind CSS (Stitch Integration) -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#e11d48", // Vibrant Red
+                        "background-light": "#f8fafc",
+                        "background-dark": "#0f172a",
+                        accent: "#3b82f6", // Vibrant Blue
+                    },
+                    fontFamily: {
+                        display: ["Outfit", "sans-serif"],
+                        sans: ["Outfit", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.75rem",
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                },
+            },
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <title><?= $car['title'] ?> &mdash; ChinaCars</title>
 </head>
 
-<body class="<?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark-theme' : '' ?>">
+<body
+    class="font-display bg-background-light dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-300 <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark-theme' : '' ?>">
 
     <?php include("app/include/header.php"); ?>
 
-    <div class="container">
-        <div class="content row">
-            <div class="main-content col-md-9 col-12">
-                <h2><?= $car['title'] ?></h2>
-
-                <div class="single_post row">
-                    <div class="img col-12 mb-3" style="position: relative;">
-                        <?php if (isset($_SESSION['id'])): ?>
-                            <button class="fav-btn" data-id="<?= $car['id'] ?>" style="position: absolute; top: 15px; right: 30px; background: rgba(255,255,255,0.8); border: none; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; font-size: 1.6rem; color: #ff4757; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                                <i class="<?= in_array($car['id'], $user_favorites) ? 'fas' : 'far' ?> fa-heart"></i>
-                            </button>
-                        <?php endif; ?>
-                        <?php if ($car['img']): ?>
-                            <img src="<?= BASE_URL . 'assets/images/cars/' . $car['img'] ?>" alt="<?= $car['title'] ?>"
-                                class="img-thumbnail w-100">
-                        <?php else: ?>
-                            <div class="car-no-img-big"><i class="fas fa-car fa-5x"></i></div>
-                        <?php endif; ?>
+    <main class="max-w-7xl mx-auto px-4 py-8 mt-20">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-8 space-y-8">
+                <div class="flex justify-between items-end animate-fade-in-up">
+                    <div class="space-y-2">
+                        <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                            <?= htmlspecialchars($car['title']) ?>
+                        </h1>
+                        <p class="text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                            <span
+                                class="px-3 py-1 bg-primary text-white text-xs font-bold rounded-full uppercase tracking-wider"><?= htmlspecialchars($car['brand_name']) ?></span>
+                            Добавлено: <?= date('d.m.Y', strtotime($car['created_date'])) ?>
+                        </p>
                     </div>
+                    <div class="text-right">
+                        <span class="text-3xl font-bold text-primary"><?= number_format($car['price'], 0, '', ' ') ?>
+                            ₽</span>
+                    </div>
+                </div>
 
-                    <?php if (count($carImages) > 0): ?>
-                        <div class="col-12 mb-3">
-                            <h4>Фотогалерея</h4>
-                            <div class="row gallery-row">
-                                <?php foreach ($carImages as $image): ?>
-                                    <div class="col-3 mb-2">
-                                        <a href="<?= BASE_URL . 'assets/images/cars/' . $image['img'] ?>" target="_blank">
-                                            <img src="<?= BASE_URL . 'assets/images/cars/' . $image['img'] ?>" alt="Фото"
-                                                class="img-thumbnail gallery-thumb">
-                                        </a>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
+                <div class="relative group rounded-3xl overflow-hidden shadow-2xl glass dark:bg-slate-800/40 border border-slate-200 dark:border-white/10 animate-fade-in-up"
+                    style="animation-delay: 0.1s;">
+                    <?php if ($car['img']): ?>
+                        <img alt="<?= htmlspecialchars($car['title']) ?>"
+                            class="w-full h-[400px] md:h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
+                            src="<?= BASE_URL . 'assets/images/cars/' . $car['img'] ?>" />
+                    <?php else: ?>
+                        <div
+                            class="w-full h-[400px] md:h-[500px] bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
+                            <i class="fas fa-car fa-10x text-slate-400"></i>
                         </div>
                     <?php endif; ?>
 
-                    <div class="col-12 mb-3">
-                        <div class="car-price-big">
-                            <?= number_format($car['price'], 0, '', ' ') ?> &#8381;
-                        </div>
+                    <div
+                        class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none">
                     </div>
 
-                    <div class="col-12 mb-3">
-                        <h4>Технические характеристики</h4>
-                        <table class="table table-striped specs-table">
-                            <tbody>
-                                <tr>
-                                    <td><i class="fas fa-trademark"></i> Бренд</td>
-                                    <td><strong><?= $car['brand_name'] ?></strong></td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas fa-calendar"></i> Год выпуска</td>
-                                    <td><?= $car['year'] ?></td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas fa-road"></i> Пробег</td>
-                                    <td><?= number_format($car['mileage'], 0, '', ' ') ?> км</td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas fa-gas-pump"></i> Тип двигателя</td>
-                                    <td><?= $car['engine_type'] ?></td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas fa-cog"></i> Объём двигателя</td>
-                                    <td><?= $car['engine_volume'] ?> л</td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas fa-tachometer-alt"></i> Мощность</td>
-                                    <td><?= $car['horsepower'] ?> л.с.</td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas fa-exchange-alt"></i> КПП</td>
-                                    <td><?= $car['transmission'] ?></td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas fa-cogs"></i> Привод</td>
-                                    <td><?= $car['drive_type'] ?></td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas fa-car"></i> Тип кузова</td>
-                                    <td><?= $car['body_type'] ?></td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas fa-palette"></i> Цвет</td>
-                                    <td><?= $car['color'] ?></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <?php if (!empty($car['description'])): ?>
-                        <div class="col-12 mb-3">
-                            <h4>Описание</h4>
-                            <div class="single_post_text">
-                                <?= $car['description'] ?>
-                            </div>
-                        </div>
+                    <?php if (isset($_SESSION['id'])): ?>
+                        <button
+                            class="fav-btn absolute top-6 right-6 p-4 bg-white/90 dark:bg-slate-800/90 rounded-full shadow-lg hover:bg-white/90 hover:scale-110 active:scale-95 transition-all outline-none border-none cursor-pointer flex items-center justify-center z-20 pointer-events-auto"
+                            data-id="<?= $car['id'] ?>" title="В избранное">
+                            <span
+                                class="material-icons transition-colors <?= in_array($car['id'], $user_favorites) ? 'text-primary' : 'text-slate-400' ?>"><?= in_array($car['id'], $user_favorites) ? 'favorite' : 'favorite_border' ?></span>
+                        </button>
                     <?php endif; ?>
 
-                    <div class="info">
-                        <i class="far fa-user"> <?= $car['username']; ?></i>
-                        <i class="far fa-calendar"> <?= $car['created_date']; ?></i>
-                    </div>
+                    <?php
+                    $compareList = isset($_SESSION['compare']) ? $_SESSION['compare'] : [];
+                    $inCompare = in_array($car['id'], $compareList);
+                    $compareTopPos = isset($_SESSION['id']) ? 'top-24' : 'top-6';
+                    ?>
+                    <button
+                        class="compare-btn absolute <?= $compareTopPos ?> right-6 p-4 <?= $inCompare ? 'bg-primary text-white' : 'bg-white/90 dark:bg-slate-800/90 text-slate-400' ?> rounded-full shadow-lg hover:bg-primary hover:text-white hover:scale-110 active:scale-95 transition-all outline-none border-none cursor-pointer flex items-center justify-center z-10"
+                        data-id="<?= $car['id'] ?>" title="К сравнению">
+                        <span class="material-icons">balance</span>
+                    </button>
+                </div>
 
+                <!-- Галерея -->
+                <?php if (count($carImages) > 0): ?>
+                    <section class="space-y-4 animate-fade-in-up" style="animation-delay: 0.15s;">
+                        <h2 class="text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
+                            <span class="w-8 h-1 bg-primary rounded-full"></span> Фотогалерея
+                        </h2>
+                        <div class="flex gap-4 overflow-x-auto pb-4 custom-scrollbar">
+                            <?php foreach ($carImages as $image): ?>
+                                <a href="<?= BASE_URL . 'assets/images/cars/' . $image['img'] ?>" target="_blank"
+                                    class="flex-none w-40 h-32 rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-700">
+                                    <img src="<?= BASE_URL . 'assets/images/cars/' . $image['img'] ?>" alt="Фото авто"
+                                        class="w-full h-full object-cover hover:scale-110 transition-transform duration-300">
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </section>
+                <?php endif; ?>
+
+                <section class="space-y-6 pt-4 animate-fade-in-up" style="animation-delay: 0.2s;">
+                    <h2 class="text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
+                        <span class="w-8 h-1 bg-primary rounded-full"></span>
+                        Характеристики
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div
+                            class="spec-card flex items-center justify-between p-4 glass dark:!bg-slate-800/40 border border-white/40 dark:!border-white/5 rounded-2xl transition-all shadow-sm hover:translate-y-[-2px]">
+                            <div class="flex items-center gap-3">
+                                <span class="material-icons text-slate-400">calendar_today</span>
+                                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Год выпуска</span>
+                            </div>
+                            <span class="font-bold text-slate-900 dark:text-white"><?= $car['year'] ?></span>
+                        </div>
+                        <div
+                            class="spec-card flex items-center justify-between p-4 glass dark:!bg-slate-800/40 border border-white/40 dark:!border-white/5 rounded-2xl transition-all shadow-sm hover:translate-y-[-2px]">
+                            <div class="flex items-center gap-3">
+                                <span class="material-icons text-slate-400">speed</span>
+                                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Пробег</span>
+                            </div>
+                            <span
+                                class="font-bold text-slate-900 dark:text-white"><?= number_format($car['mileage'], 0, '', ' ') ?>
+                                км</span>
+                        </div>
+                        <div
+                            class="spec-card flex items-center justify-between p-4 glass dark:!bg-slate-800/40 border border-white/40 dark:!border-white/5 rounded-2xl transition-all shadow-sm hover:translate-y-[-2px]">
+                            <div class="flex items-center gap-3">
+                                <span class="material-icons text-slate-400">settings</span>
+                                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Мощность</span>
+                            </div>
+                            <span class="font-bold text-slate-900 dark:text-white"><?= $car['horsepower'] ?> л.с.</span>
+                        </div>
+                        <div
+                            class="spec-card flex items-center justify-between p-4 glass dark:!bg-slate-800/40 border border-white/40 dark:!border-white/5 rounded-2xl transition-all shadow-sm hover:translate-y-[-2px]">
+                            <div class="flex items-center gap-3">
+                                <span class="material-icons text-slate-400">local_gas_station</span>
+                                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Двигатель</span>
+                            </div>
+                            <span class="font-bold text-slate-900 dark:text-white"><?= $car['engine_type'] ?></span>
+                        </div>
+                        <div
+                            class="spec-card flex items-center justify-between p-4 glass dark:!bg-slate-800/40 border border-white/40 dark:!border-white/5 rounded-2xl transition-all shadow-sm hover:translate-y-[-2px]">
+                            <div class="flex items-center gap-3">
+                                <span class="material-icons text-slate-400">directions_car</span>
+                                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Кузов</span>
+                            </div>
+                            <span class="font-bold text-slate-900 dark:text-white"><?= $car['body_type'] ?></span>
+                        </div>
+                        <div
+                            class="spec-card flex items-center justify-between p-4 glass dark:!bg-slate-800/40 border border-white/40 dark:!border-white/5 rounded-2xl transition-all shadow-sm hover:translate-y-[-2px]">
+                            <div class="flex items-center gap-3">
+                                <span class="material-icons text-slate-400">swap_calls</span>
+                                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">КПП</span>
+                            </div>
+                            <span class="font-bold text-slate-900 dark:text-white"><?= $car['transmission'] ?></span>
+                        </div>
+                        <div
+                            class="spec-card flex items-center justify-between p-4 glass dark:!bg-slate-800/40 border border-white/40 dark:!border-white/5 rounded-2xl transition-all shadow-sm hover:translate-y-[-2px]">
+                            <div class="flex items-center gap-3">
+                                <span class="material-icons text-slate-400">tire_repair</span>
+                                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Привод</span>
+                            </div>
+                            <span class="font-bold text-slate-900 dark:text-white"><?= $car['drive_type'] ?></span>
+                        </div>
+                        <div
+                            class="spec-card flex items-center justify-between p-4 glass dark:!bg-slate-800/40 border border-white/40 dark:!border-white/5 rounded-2xl transition-all shadow-sm hover:translate-y-[-2px]">
+                            <div class="flex items-center gap-3">
+                                <span class="material-icons text-slate-400">water_drop</span>
+                                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Объем</span>
+                            </div>
+                            <span class="font-bold text-slate-900 dark:text-white"><?= $car['engine_volume'] ?> л</span>
+                        </div>
+                        <div
+                            class="spec-card flex items-center justify-between p-4 glass dark:!bg-slate-800/40 border border-white/40 dark:!border-white/5 rounded-2xl transition-all shadow-sm hover:translate-y-[-2px]">
+                            <div class="flex items-center gap-3">
+                                <span class="material-icons text-slate-400">palette</span>
+                                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Цвет</span>
+                            </div>
+                            <span
+                                class="font-bold text-slate-900 dark:text-white"><?= htmlspecialchars($car['color']) ?></span>
+                        </div>
+                    </div>
+                </section>
+
+                <?php if (!empty($car['description'])): ?>
+                    <section class="space-y-4 pt-4 animate-fade-in-up" style="animation-delay: 0.3s;">
+                        <h2 class="text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
+                            <span class="w-8 h-1 bg-primary rounded-full"></span> Описание
+                        </h2>
+                        <div class="glass p-8 rounded-[2rem] shadow-sm animate-fade-in-up prose prose-slate dark:prose-invert max-w-none break-all"
+                            style="animation-delay: 0.4s;">
+                            <?= $car['description'] ?>
+                        </div>
+                    </section>
+                <?php endif; ?>
+
+                <div class="pt-6 relative z-0">
                     <?php
                     $page = $car['id'];
                     $_GET['post'] = $car['id'];
                     include("app/include/comments.php");
                     ?>
                 </div>
+
             </div>
 
-            <div class="sidebar col-md-3 col-12">
-                <div class="section search">
-                    <h3>Поиск</h3>
-                    <form action="search.php" method="post">
-                        <input type="text" name="search-term" class="text-input" placeholder="Марка, модель...">
-                    </form>
-                </div>
-
-                <div class="section topics">
-                    <h3>Бренды</h3>
-                    <ul>
-                        <?php foreach ($brands as $b): ?>
-                            <li>
-                                <a href="<?= BASE_URL . 'category.php?id=' . $b['id']; ?>"><?= $b['name']; ?></a>
-                            </li>
+            <!-- Сайдбар -->
+            <aside class="lg:col-span-4 space-y-8 mt-12 lg:mt-0">
+                <div
+                    class="bg-[#fff] dark:bg-slate-800 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-bold text-slate-900 dark:text-white">Популярные бренды</h3>
+                    </div>
+                    <ul class="space-y-1 m-0 p-0 list-none">
+                        <?php foreach (array_slice($brands, 0, 6) as $b): ?>
+                            <li><a class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary"
+                                    style="text-decoration:none;"
+                                    href="<?= BASE_URL . 'index.php?brand=' . $b['id'] ?>"><?= $b['name'] ?> <span
+                                        class="material-icons text-slate-300 text-sm">chevron_right</span></a></li>
                         <?php endforeach; ?>
+                        <li><a href="<?= BASE_URL ?>"
+                                class="block text-center mt-3 text-sm text-primary font-bold hover:underline"
+                                style="text-decoration:none;">Все бренды</a></li>
                     </ul>
                 </div>
-            </div>
+
+                <div
+                    class="glass dark:bg-slate-800/40 p-6 rounded-3xl border border-slate-200 dark:border-white/10 shadow-lg">
+                    <h3 class="text-lg font-bold mb-4 flex items-center text-slate-900 dark:text-white">
+                        <span class="material-icons text-primary mr-2">contact_support</span> Связаться с нами
+                    </h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Заинтересовал этот автомобиль? Оставьте
+                        заявку, и мы свяжемся с вами для консультации.</p>
+                    <button
+                        class="magnetic-btn w-full bg-primary hover:bg-red-600 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all border-none cursor-pointer shadow-[0_0_20px_rgba(225,29,72,0.3)] hover:shadow-[0_0_30px_rgba(225,29,72,0.5)]">
+                        <span class="material-icons">phone_in_talk</span> Заказать звонок
+                    </button>
+                    <a href="https://wa.me/79991234567" target="_blank"
+                        class="magnetic-btn mt-3 w-full bg-[#25D366] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all text-center"
+                        style="text-decoration:none;">
+                        <i class="fab fa-whatsapp text-lg"></i> Написать в WhatsApp
+                    </a>
+                </div>
+            </aside>
         </div>
-    </div>
+    </main>
 
     <?php include("app/include/footer.php"); ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
         crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.compare-btn').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const carId = this.dataset.id;
+                    const isAdded = this.classList.contains('bg-primary');
+                    const action = isAdded ? 'remove' : 'add';
+
+                    fetch('<?= BASE_URL ?>ajax_compare.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: action, car_id: carId })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                const badge = document.getElementById('compareBadge');
+                                if (badge) {
+                                    badge.textContent = data.count;
+                                    if (data.count > 0) {
+                                        badge.classList.remove('hidden');
+                                    } else {
+                                        badge.classList.add('hidden');
+                                    }
+                                }
+
+                                const iconPos = this.querySelector('.material-icons');
+                                if (data.is_added) {
+                                    this.classList.remove('bg-white/90', 'dark:bg-slate-800/90', 'text-slate-400');
+                                    this.classList.add('bg-primary', 'text-white');
+                                } else {
+                                    this.classList.add('bg-white/90', 'dark:bg-slate-800/90', 'text-slate-400');
+                                    this.classList.remove('bg-primary', 'text-white');
+                                }
+                            } else {
+                                alert(data.message);
+                            }
+                        })
+                        .catch(err => console.error('Error:', err));
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

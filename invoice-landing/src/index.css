@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #cfa117;
+  --color-background-dark: #0a1a15;
+  --color-background-light: #f8f7f6;
+
+  --font-display: 'Inter', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background-dark);
+    color: #f1f5f9;
+    /* text-slate-100 */
+    font-family: var(--font-display);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-serif);
+  }
+}
+
+@layer utilities {
+  .jade-gradient {
+    background: radial-gradient(circle at top right, #142d25, #0a1a15);
+  }
+
+  .stone-texture {
+    background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCfqGfUFn34Xr84O-fCRQ3eJTp2PTzQobtSfNSeL8i6pJu3jFl9D4G9z5orCpn8bYJHnvtFUGKlBR_8WrBFcHzG4E_S_bjWE7G1uLzifbZbJjBiyLtKKzsUhGtjmwv_1Zc6kpQYALJDSQgpHrCBO5xqLRfHoP7pWi4y3Nd67zy3_vCT62Td6pZANdlloKVTD5AVN38t0rQpp2h0aVCVSufIdWBFqO452-1tcHaTgMjLP8orCgXa4OKM3AxbTxWB6vWmIZMfB6uODeVW");
+    opacity: 0.15;
+  }
+
+  .reflection-overlay {
+    background: linear-gradient(to bottom, rgba(10, 26, 21, 0) 60%, rgba(10, 26, 21, 0.8) 100%);
+  }
+}

@@ -54,6 +54,8 @@ include "../../app/controllers/users.php";
                             <td>
                                 <a href="edit.php?edit_id=<?= $user['id'] ?>" class="btn btn-sm btn-primary"><i
                                         class="fas fa-edit"></i></a>
+                                <a href="edit.php?edit_id=<?= $user['id'] ?>&reset=1" class="btn btn-sm btn-warning"
+                                    title="Сбросить пароль"><i class="fas fa-key"></i></a>
                                 <a href="index.php?delete_id=<?= $user['id'] ?>" class="btn btn-sm btn-danger"
                                     onclick="return confirm('Удалить пользователя?')"><i class="fas fa-trash"></i></a>
                             </td>

@@ -41,7 +41,7 @@ include "../../app/controllers/users.php";
                     class="col-3 btn btn-warning">Редактировать</a>
             </div>
             <div class="row title-table">
-                <h2>Создать пользователя</h2>
+                <h2>Редактировать пользователя</h2>
             </div>
             <div class="row add-post">
                 <div class="mb-12 col-12 col-md-12 err">
@@ -49,15 +49,16 @@ include "../../app/controllers/users.php";
                     <?php include "../../app/helps/errorInfo.php"; ?>
                 </div>
                 <form action="edit.php" method="post">
+                    <?= csrfField(); ?>
                     <input name="id" value="<?= $id; ?>" type="hidden">
                     <div class="col">
                         <label for="formGroupExampleInput" class="form-label">Логин</label>
-                        <input name="login" value="<?= $username; ?>" type="text" class="form-control"
+                        <input name="login" value="<?= htmlspecialchars($username); ?>" type="text" class="form-control"
                             id="formGroupExampleInput" placeholder="введите ваш логин...">
                     </div>
                     <div class="col">
                         <label for="exampleInputEmail1" class="form-label">Email</label>
-                        <input name="mail" value="<?= $email; ?>" type="email" class="form-control" readonly
+                        <input name="mail" value="<?= htmlspecialchars($email); ?>" type="email" class="form-control" readonly
                             id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="введите ваш email...">
                     </div>
                     <div class="col mt-2 mb-2">
@@ -110,10 +111,35 @@ include "../../app/controllers/users.php";
         crossorigin="anonymous"></script>
 
     <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js" integrity="sha384-KsvD1yqQ1/1+IA7gi3P0tyJcT3vR+NdBTt13hSJ2lnve8agRGXTTyNaBYmCR/Nwi" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.min.js" integrity="sha384-nsg8ua9HAw1y0W1btsyWgBklPnCUAFLuTMS2G72MMONqmOymq585AcH49TLBQObG" crossorigin="anonymous"></script>
--->
+    <script>
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', function () {
+                const targetSelector = this.getAttribute('data-target');
+                const targetInput = document.querySelector(targetSelector);
+                const icon = this.querySelector('i');
+
+                if (targetInput.type === 'password') {
+                    targetInput.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    targetInput.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        });
+
+        // Автоматически фокусируемся на поле пароля, если пришли с кнопкой сброса
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('reset')) {
+            const passInput = document.getElementById('exampleInputPassword1');
+            if (passInput) {
+                passInput.focus();
+                passInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    </script>
 </body>
 
 </html>

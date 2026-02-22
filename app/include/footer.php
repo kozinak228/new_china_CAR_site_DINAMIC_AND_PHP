@@ -1,68 +1,73 @@
-<div class="footer container-fluid">
-    <div class="footer-content container">
-        <div class="row">
-            <div class="footer-section about col-md-4 col-12">
-                <h3 class="logo-text"><i class="fas fa-car"></i> ChinaCars</h3>
-                <p>
-                    ChinaCars — ваш надёжный помощник в подборе и покупке автомобилей из Китая.
-                    Широкий каталог, подробные характеристики, честные цены.
-                </p>
-                <div class="contact">
-                    <span><i class="fas fa-phone"></i> &nbsp; +7 (999) 123-45-67</span>
-                    <span><i class="fas fa-envelope"></i> &nbsp; info@chinacars.ru</span>
+<footer class="bg-slate-950 pt-12 pb-6 border-t border-white/10 mt-auto w-full z-10 relative">
+    <div class="max-w-7xl mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div class="col-span-1 md:col-span-2">
+                <div class="flex items-center space-x-2 mb-4">
+                    <span class="material-icons text-primary text-2xl">directions_car</span>
+                    <span class="text-xl font-bold tracking-tight text-white">China<span
+                            class="text-primary">Cars</span></span>
                 </div>
-                <div class="socials">
-                    <a href="#"><i class="fab fa-telegram"></i></a>
-                    <a href="#"><i class="fab fa-whatsapp"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-youtube"></i></a>
+                <p class="text-slate-400 max-w-sm mb-4 text-sm leading-snug">Ваш надежный партнер в мире премиальных
+                    автомобилей из Китая. Широкий каталог, подробные характеристики, честные цены.</p>
+                <div class="flex space-x-3">
+                    <a href="#"
+                        class="w-8 h-8 rounded-full glass hover:bg-primary transition-colors flex items-center justify-center text-white text-sm"
+                        style="text-decoration:none;"><i class="fab fa-telegram"></i></a>
+                    <a href="#"
+                        class="w-8 h-8 rounded-full glass hover:bg-primary transition-colors flex items-center justify-center text-white text-sm"
+                        style="text-decoration:none;"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#"
+                        class="w-8 h-8 rounded-full glass hover:bg-primary transition-colors flex items-center justify-center text-white text-sm"
+                        style="text-decoration:none;"><i class="fab fa-instagram"></i></a>
+                    <a href="#"
+                        class="w-8 h-8 rounded-full glass hover:bg-primary transition-colors flex items-center justify-center text-white text-sm"
+                        style="text-decoration:none;"><i class="fab fa-youtube"></i></a>
                 </div>
             </div>
 
-            <div class="footer-section links col-md-4 col-12">
-                <h3>Навигация</h3>
-                <br>
-                <ul>
-                    <a href="<?php echo BASE_URL; ?>">
-                        <li>Каталог</li>
-                    </a>
-                    <a href="<?php echo BASE_URL . 'gallery.php'; ?>">
-                        <li>Галерея</li>
-                    </a>
-                    <a href="#">
-                        <li>О компании</li>
-                    </a>
-                    <a href="#">
-                        <li>Доставка</li>
-                    </a>
-                    <a href="#">
-                        <li>Контакты</li>
-                    </a>
+            <div>
+                <h4 class="text-white font-bold mb-4 text-sm">Навигация</h4>
+                <ul class="space-y-2 m-0 p-0 list-none text-sm">
+                    <li><a href="<?php echo BASE_URL ?>" class="text-slate-400 hover:text-primary transition-colors"
+                            style="text-decoration:none;">Каталог</a></li>
+                    <li><a href="<?php echo BASE_URL . 'gallery.php' ?>"
+                            class="text-slate-400 hover:text-primary transition-colors"
+                            style="text-decoration:none;">Галерея</a></li>
+                    <li><a href="<?php echo BASE_URL . 'about.php' ?>"
+                            class="text-slate-400 hover:text-primary transition-colors" style="text-decoration:none;">О
+                            компании</a></li>
+                    <li><a href="#" class="text-slate-400 hover:text-primary transition-colors"
+                            style="text-decoration:none;">Контакты</a></li>
                 </ul>
             </div>
 
-            <div class="footer-section contact-form col-md-4 col-12">
-                <h3>Обратная связь</h3>
-                <br>
-                <form action="#" method="post">
-                    <input type="email" name="email" class="text-input contact-input" placeholder="Ваш email...">
-                    <textarea rows="4" name="message" class="text-input contact-input"
-                        placeholder="Ваш вопрос..."></textarea>
-                    <button type="submit" class="btn btn-big contact-btn">
-                        <i class="fas fa-envelope"></i>
-                        Отправить
-                    </button>
-                </form>
+            <div>
+                <h4 class="text-white font-bold mb-4 text-sm">Контакты</h4>
+                <ul class="space-y-2 m-0 p-0 list-none text-sm">
+                    <li class="flex items-center space-x-2 text-slate-400">
+                        <span class="material-icons text-primary text-sm">phone</span>
+                        <span>+7 (999) 123-45-67</span>
+                    </li>
+                    <li class="flex items-center space-x-2 text-slate-400">
+                        <span class="material-icons text-primary text-sm">email</span>
+                        <span>info@chinacars.ru</span>
+                    </li>
+                </ul>
             </div>
-
         </div>
 
-        <div class="footer-bottom">
-            &copy; ChinaCars
-            <?php echo date('Y'); ?> | Каталог автомобилей из Китая
+        <div
+            class="border-t border-white/10 pt-6 flex flex-col md:flex-row items-center justify-between text-slate-500 text-xs">
+            <p class="m-0">&copy; <?php echo date('Y'); ?> ChinaCars Premium. Все права защищены.</p>
+            <div class="flex space-x-4 mt-3 md:mt-0">
+                <a href="#" class="hover:text-white transition-colors" style="text-decoration:none;">Политика
+                    конфиденциальности</a>
+                <a href="#" class="hover:text-white transition-colors" style="text-decoration:none;">Условия
+                    использования</a>
+            </div>
         </div>
     </div>
-</div>
+</footer>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -91,7 +96,7 @@
                 e.preventDefault();
                 e.stopPropagation();
                 const carId = this.getAttribute('data-id');
-                const icon = this.querySelector('i');
+                const icon = this.querySelector('i') || this.querySelector('.material-icons');
 
                 fetch('<?= BASE_URL ?>ajax_favorites.php', {
                     method: 'POST',
@@ -104,11 +109,23 @@
                     .then(data => {
                         if (data.status === 'success') {
                             if (data.action === 'added') {
-                                icon.classList.remove('far');
-                                icon.classList.add('fas');
+                                if (icon.tagName.toLowerCase() === 'i') {
+                                    icon.classList.remove('far', 'text-white');
+                                    icon.classList.add('fas', 'text-primary');
+                                } else {
+                                    icon.textContent = 'favorite';
+                                    icon.classList.remove('text-slate-400', 'text-white');
+                                    icon.classList.add('text-primary');
+                                }
                             } else {
-                                icon.classList.remove('fas');
-                                icon.classList.add('far');
+                                if (icon.tagName.toLowerCase() === 'i') {
+                                    icon.classList.remove('fas', 'text-primary');
+                                    icon.classList.add('far', 'text-white');
+                                } else {
+                                    icon.textContent = 'favorite_border';
+                                    icon.classList.remove('text-primary');
+                                    icon.classList.add('text-slate-400');
+                                }
                             }
                         } else {
                             if (data.message === 'Not authenticated') {

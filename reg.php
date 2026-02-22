@@ -2,13 +2,83 @@
 include "path.php";
 include "app/controllers/users.php";
 ?>
-<html lang="ru">
+<html lang="ru" class="<?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark' : '' ?>">
 
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Tailwind CSS (Stitch Integration) -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#e11d48", // Vibrant Red
+                        "background-light": "#f8fafc",
+                        "background-dark": "#0f172a",
+                        accent: "#3b82f6", // Vibrant Blue
+                    },
+                    fontFamily: {
+                        display: ["Outfit", "sans-serif"],
+                        sans: ["Outfit", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.75rem",
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                },
+            },
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
+        /* Animated Gradient Background */
+        .bg-animated-gradient {
+            background-size: 300% 300%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        /* Light Theme: Yellow to White */
+        .theme-light-gradient {
+            background: linear-gradient(135deg, #fef08a, #ffffff, #fde047, #ffffff);
+        }
+
+        /* Dark Theme: Yellow to Dark Blue */
+        .theme-dark-gradient {
+            background: linear-gradient(135deg, #eab308, #1e3a8a, #0f172a, #1e40af);
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        input:focus {
+            box-shadow: 0 0 15px rgba(225, 29, 72, 0.2);
+        }
+    </style>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
@@ -25,65 +95,124 @@ include "app/controllers/users.php";
     <title>My blog</title>
 </head>
 
-<body class="<?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark-theme' : '' ?>">
+<body
+    class="bg-slate-50 dark:bg-background-dark text-slate-900 dark:text-slate-100 <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark-theme' : '' ?>">
 
     <?php include("app/include/header.php"); ?>
-    <!-- END HEADER -->
-    <!-- FORM -->
-    <div class="container reg_form">
-        <form action="reg.php" method="post" class="row justify-content-center">
-            <h2>Форма регистрации</h2>
-            <div class="mb-3 col-12 col-md-4 err">
-                <?php if (!empty($errMsg)):
-                    foreach ($errMsg as $e): ?>
-                        <p><?= $e ?></p>
-                    <?php endforeach; endif; ?>
-            </div>
-            <?= csrfField() ?>
-            <div class="w-100"></div>
-            <div class="mb-3 col-12 col-md-4">
-                <label for="formGroupExampleInput" class="form-label">Ваш логин</label>
-                <input name="login" value="<?= $login ?>" type="text" class="form-control" id="formGroupExampleInput"
-                    placeholder="введите ваш логин...">
-            </div>
-            <div class="w-100"></div>
-            <div class="mb-3 col-12 col-md-4">
-                <label for="exampleInputEmail1" class="form-label">Email</label>
-                <input name="mail" value="<?= $email ?>" type="email" class="form-control" id="exampleInputEmail1"
-                    aria-describedby="emailHelp" placeholder="введите ваш email...">
-                <div id="emailHelp" class="form-text">Ваш email адрес не будет использован для спама!</div>
-            </div>
-            <div class="w-100"></div>
-            <div class="mb-3 col-12 col-md-4">
-                <label for="exampleInputPassword1" class="form-label">Пароль</label>
-                <div class="input-group">
-                    <input name="pass-first" type="password" class="form-control" id="exampleInputPassword1"
-                        placeholder="введите ваш пароль...">
-                    <button class="btn btn-outline-secondary toggle-password" type="button"
-                        data-target="#exampleInputPassword1">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="w-100"></div>
-            <div class="mb-3 col-12 col-md-4">
-                <label for="exampleInputPassword2" class="form-label">Повторите пароль</label>
-                <div class="input-group">
-                    <input name="pass-second" type="password" class="form-control" id="exampleInputPassword2"
-                        placeholder="повторите ваш пароль...">
-                    <button class="btn btn-outline-secondary toggle-password" type="button"
-                        data-target="#exampleInputPassword2">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="w-100"></div>
-            <div class="mb-3 col-12 col-md-4">
-                <button type="submit" class="btn btn-secondary" name="button-reg">Регистрация</button>
-                <a href="<?= BASE_URL ?>log.php">Войти</a>
-            </div>
-        </form>
+
+    <!-- Background Decoration -->
+    <div
+        class="fixed inset-0 z-0 bg-animated-gradient <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'theme-dark-gradient' : 'theme-light-gradient' ?>">
     </div>
+
+    <!-- START FORM -->
+    <main class="relative z-10 flex-1 flex items-center justify-center px-4 py-16 mt-16 min-h-[80vh]">
+        <div class="w-full max-w-lg">
+            <div
+                class="glass-card rounded-xl p-8 lg:p-10 shadow-2xl relative overflow-hidden bg-white/5 dark:bg-black/20">
+                <!-- Subtle pattern overlay -->
+                <div
+                    class="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+                </div>
+                <div class="relative z-10">
+                    <div class="mb-8 text-center">
+                        <h2 class="text-3xl font-bold tracking-tight mb-2 font-display">Регистрация</h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm">Создайте аккаунт для полного доступа.</p>
+                    </div>
+
+                    <div class="mb-4 text-center err">
+                        <?php if (!empty($errMsg)):
+                            foreach ($errMsg as $e): ?>
+                                <p class="text-primary text-sm"><?= $e ?></p>
+                            <?php endforeach; endif; ?>
+                    </div>
+
+                    <form action="reg.php" method="post" class="space-y-6">
+                        <?= csrfField() ?>
+
+                        <div>
+                            <label
+                                class="block text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2 ml-1"
+                                for="formGroupExampleInput">Ваш логин</label>
+                            <div class="relative group">
+                                <span
+                                    class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">person</span>
+                                <input name="login" value="<?= htmlspecialchars($login ?? '') ?>" type="text"
+                                    class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded-lg py-3 pl-12 pr-4 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                    id="formGroupExampleInput" placeholder="введите ваш логин...">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2 ml-1"
+                                for="exampleInputEmail1">Email</label>
+                            <div class="relative group">
+                                <span
+                                    class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">mail</span>
+                                <input name="mail" value="<?= htmlspecialchars($email ?? '') ?>" type="email"
+                                    class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded-lg py-3 pl-12 pr-4 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                    id="exampleInputEmail1" placeholder="введите ваш email...">
+                            </div>
+                            <div class="form-text text-[10px] uppercase tracking-wider text-slate-400 mt-2 ml-1">Ваш
+                                email адрес не будет использован для спама!</div>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2 ml-1"
+                                for="exampleInputPassword1">Пароль</label>
+                            <div class="relative group">
+                                <span
+                                    class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">lock</span>
+                                <input name="pass-first" type="password"
+                                    class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded-lg py-3 pl-12 pr-12 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                    id="exampleInputPassword1" placeholder="введите пароль...">
+                                <button
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 toggle-password"
+                                    type="button" data-target="#exampleInputPassword1">
+                                    <span class="material-icons text-[20px]">visibility</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2 ml-1"
+                                for="exampleInputPassword2">Повторите пароль</label>
+                            <div class="relative group">
+                                <span
+                                    class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">lock</span>
+                                <input name="pass-second" type="password"
+                                    class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 rounded-lg py-3 pl-12 pr-12 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                    id="exampleInputPassword2" placeholder="повторите пароль...">
+                                <button
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 toggle-password"
+                                    type="button" data-target="#exampleInputPassword2">
+                                    <span class="material-icons text-[20px]">visibility</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" name="button-reg"
+                            class="w-full bg-primary hover:bg-primary/90 text-white py-4 rounded-lg font-bold tracking-widest uppercase text-sm transition-all shadow-lg shadow-primary/30 flex items-center justify-center gap-2 group mt-6">
+                            Зарегистрироваться
+                            <span
+                                class="material-icons transition-transform group-hover:translate-x-1">arrow_forward</span>
+                        </button>
+                    </form>
+
+                    <div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700/50 text-center">
+                        <p class="text-sm text-slate-500 dark:text-slate-400">
+                            Уже есть аккаунт?
+                            <a href="<?= BASE_URL ?>log.php"
+                                class="text-primary font-bold hover:underline underline-offset-4 ml-1 transition-all">Войти</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
     <!-- END FORM -->
 
     <!-- footer -->

@@ -125,287 +125,455 @@ $user_favorites_cars = $stmt_fav->fetchAll();
 $userAvatar = !empty($currentUser['avatar']) ? BASE_URL . "assets/images/avatars/" . $currentUser['avatar'] : '';
 ?>
 <!doctype html>
-<html lang="ru">
+<html lang="ru" class="<?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark' : '' ?>">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
     <title>Личный кабинет &mdash; ChinaCars</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#e11d48",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#0a0607",
+                    },
+                    fontFamily: {
+                        display: ["Space Grotesk", "sans-serif"],
+                        sans: ["Space Grotesk", "sans-serif"],
+                    }
+                }
+            }
+        };
+    </script>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+
+    <!-- Bootstrap and Cropper -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+
     <style>
-        .avatar-wrapper {
-            position: relative;
-            width: 150px;
-            height: 150px;
-            margin: 0 auto 20px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 3px solid var(--primary-color);
-            background-color: var(--card-bg);
-            cursor: pointer;
+        body {
+            font-family: 'Space Grotesk', sans-serif;
         }
 
-        .avatar-wrapper img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .glass-panel {
+            background: rgba(23, 17, 19, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(226, 29, 72, 0.1);
         }
 
-        .avatar-wrapper .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
+        .fluid-bg {
+            background: radial-gradient(circle at 0% 0%, rgba(226, 29, 72, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(226, 29, 72, 0.1) 0%, transparent 50%);
+        }
+
+        .card-stack:hover .card-1 {
+            transform: rotate(-6deg) translateX(-60px) translateY(-10px);
+        }
+
+        .card-stack:hover .card-2 {
+            transform: rotate(0deg) translateY(-20px);
+        }
+
+        .card-stack:hover .card-3 {
+            transform: rotate(6deg) translateX(60px) translateY(-10px);
+        }
+
+        .glow-red {
+            box-shadow: 0 0 15px rgba(226, 29, 72, 0.4);
+        }
+
+        .pulse-red {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: .8;
+                transform: scale(1.02);
+                box-shadow: 0 0 25px rgba(226, 29, 72, 0.6);
+            }
+        }
+
+        .avatar-hover-icon {
             opacity: 0;
-            transition: 0.3s;
+            transition: opacity 0.3s ease;
         }
 
-        .avatar-wrapper:hover .overlay {
+        .avatar-wrapper:hover .avatar-hover-icon {
             opacity: 1;
+        }
+
+        .form-control {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: inherit !important;
+        }
+
+        .form-control:focus {
+            border-color: #e11d48 !important;
+            box-shadow: 0 0 0 0.25rem rgba(225, 29, 72, 0.25) !important;
         }
     </style>
 </head>
 
-<body class="<?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark-theme' : '' ?>">
+<body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark-theme' : '' ?>">
 
     <?php include("app/include/header.php"); ?>
 
-    <div class="container mt-5 mb-5">
-        <div class="row">
+    <!-- Fluid Background -->
+    <div class="fixed inset-0 pointer-events-none fluid-bg z-0 mt-20"></div>
 
-            <div class="col-md-4 mb-4">
-                <div class="profile-card text-center p-4">
-                    <div class="avatar-wrapper" onclick="document.getElementById('avatarInput').click();">
+    <main class="relative z-10 p-4 md:p-8 max-w-7xl mx-auto space-y-12 mt-20 mb-20">
+
+        <?php if (!empty($errMsg)): ?>
+            <div class="alert alert-danger mb-4 shadow-lg border-primary text-primary glass-panel">
+                <ul class="mb-0">
+                    <?php foreach ($errMsg as $err): ?>
+                        <li>
+                            <?= $err ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($successMsg): ?>
+            <div class="alert alert-success mb-4 shadow-lg border-green-500 text-green-400 glass-panel"
+                style="border-color: #22c55e;">
+                <?= $successMsg ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Profile Head -->
+        <section class="flex flex-col md:flex-row items-center justify-between gap-8 glass-panel p-8 rounded-3xl">
+            <div class="flex items-center gap-8">
+                <div class="relative avatar-wrapper cursor-pointer"
+                    onclick="document.getElementById('avatarInput').click();">
+                    <div
+                        class="w-32 h-32 rounded-full p-1 border-2 border-primary glow-red relative overflow-hidden group">
                         <?php if ($userAvatar): ?>
-                            <img src="<?= $userAvatar ?>" id="avatarPreview" alt="Аватар">
+                            <img src="<?= $userAvatar ?>" id="avatarPreview"
+                                class="w-full h-full rounded-full object-cover border-4 border-background-dark"
+                                alt="Avatar">
                         <?php else: ?>
-                            <div class="d-flex align-items-center justify-content-center h-100 w-100">
-                                <i class="fas fa-layer-group fa-4x text-muted" id="avatarIcon"></i>
-                                <img src="" id="avatarPreview" alt="Аватар" style="display:none;">
+                            <div
+                                class="w-full h-full rounded-full bg-slate-800 flex items-center justify-center border-4 border-background-dark">
+                                <i class="fas fa-user-circle fa-4x text-slate-500" id="avatarIcon"></i>
+                                <img src="" id="avatarPreview" class="w-full h-full rounded-full object-cover"
+                                    style="display:none;" alt="Avatar">
                             </div>
                         <?php endif; ?>
-                        <div class="overlay">
-                            <i class="fas fa-camera fa-2x"></i>
+
+                        <div
+                            class="absolute inset-0 bg-black/60 avatar-hover-icon flex items-center justify-center rounded-full m-1">
+                            <i class="fas fa-camera text-2xl text-white"></i>
                         </div>
                     </div>
-
-                    <h4><?= htmlspecialchars($currentUser['username']) ?></h4>
-                    <p class="text-muted"><?= htmlspecialchars($currentUser['email']) ?></p>
-
-                    <div class="mb-3">
-                        <?php if ($currentUser['admin']): ?>
-                            <span class="badge bg-danger p-2"><i class="fas fa-crown"></i> Администратор</span>
-                        <?php else: ?>
-                            <span class="badge bg-primary p-2"><i class="fas fa-user"></i> Пользователь</span>
-                        <?php endif; ?>
-                    </div>
-
-                    <hr>
-
-                    <h6 class="text-start mt-3 mb-3"><i class="fas fa-palette"></i> Оформление</h6>
-                    <div class="theme-toggle-card mx-auto">
-                        <div class="theme-toggle-label">
-                            <i class="fas <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'fa-moon' : 'fa-sun' ?>"></i>
-                            <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'Тёмная тема' : 'Светлая тема' ?>
+                    <?php if ($currentUser['admin']): ?>
+                        <div
+                            class="absolute -bottom-2 -right-2 bg-primary text-[10px] font-black px-2 py-1 rounded-md text-white shadow-xl uppercase tracking-widest">
+                            Admin
                         </div>
-                        <form method="post" action="profile.php">
+                    <?php else: ?>
+                        <div
+                            class="absolute -bottom-2 -right-2 bg-slate-700 text-[10px] font-black px-2 py-1 rounded-md text-white shadow-xl uppercase tracking-widest">
+                            Member
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <div>
+                    <h1 class="text-4xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
+                        <?= htmlspecialchars($currentUser['username']) ?>
+                    </h1>
+                    <p class="text-slate-500 dark:text-slate-400 text-lg mt-1">
+                        <?= htmlspecialchars($currentUser['email']) ?>
+                    </p>
+                    <div class="flex gap-3 mt-4">
+                        <form method="post" action="profile.php" class="m-0">
                             <button type="submit" name="toggle_theme"
-                                class="btn-theme-toggle <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'is-dark' : '' ?>">
-                                <span class="toggle-circle"></span>
+                                class="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm font-medium border border-slate-300 dark:border-white/10 transition-colors flex items-center gap-2">
+                                <i
+                                    class="fas <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'fa-sun' : 'fa-moon' ?>"></i>
+                                <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'Светлая тема' : 'Темная тема' ?>
                             </button>
                         </form>
-                    </div>
-
-                    <div class="mt-4">
                         <?php if ($currentUser['admin']): ?>
-                            <a href="<?= BASE_URL ?>admin/cars/index.php" class="btn btn-outline-primary w-100 mb-2">
-                                <i class="fas fa-cog"></i> Админ панель
+                            <a href="<?= BASE_URL ?>admin/cars/index.php"
+                                class="px-4 py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg text-sm font-bold border border-primary/30 transition-colors"
+                                style="text-decoration:none;">
+                                Админ панель
                             </a>
                         <?php endif; ?>
-                        <a href="<?= BASE_URL ?>logout.php" class="btn btn-outline-danger w-100">
-                            <i class="fas fa-sign-out-alt"></i> Выйти из аккаунта
+                        <a href="<?= BASE_URL ?>logout.php"
+                            class="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg text-sm font-medium border border-red-500/20 transition-colors"
+                            style="text-decoration:none;">
+                            Выйти
                         </a>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-8">
-                <div class="profile-card p-4">
+            <!-- Stats -->
+            <div class="flex gap-4 w-full md:w-auto overflow-x-auto pb-2">
+                <div
+                    class="bg-white/5 dark:bg-black/20 p-6 rounded-xl min-w-[160px] flex flex-col justify-center border border-slate-200 dark:border-white/5 shadow-sm">
+                    <span class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">В избранном</span>
+                    <span class="text-3xl font-bold text-slate-900 dark:text-white leading-none">
+                        <?= count($user_favorites_cars) ?>
+                    </span>
+                    <span class="text-primary text-xs font-bold mt-2 flex items-center gap-1">
+                        Автомобилей
+                    </span>
+                </div>
+                <div
+                    class="bg-white/5 dark:bg-black/20 p-6 rounded-xl min-w-[160px] flex flex-col justify-center border border-slate-200 dark:border-white/5 shadow-sm">
+                    <span class="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">Статус</span>
+                    <span class="text-xl font-bold text-slate-900 dark:text-white leading-tight mt-1">
+                        <?= $currentUser['admin'] ? 'Администратор' : 'Пользователь' ?>
+                    </span>
+                    <span class="text-primary text-xs font-bold mt-2 flex items-center gap-1 animate-pulse">
+                        <span class="material-icons text-xs" style="font-size: 14px;">verified</span> Активный
+                    </span>
+                </div>
+            </div>
+        </section>
 
-                    <?php if (!empty($errMsg)): ?>
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                <?php foreach ($errMsg as $err): ?>
-                                    <li><?= $err ?></li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </div>
-                    <?php endif; ?>
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-12 pt-4">
 
-                    <?php if ($successMsg): ?>
-                        <div class="alert alert-success">
-                            <?= $successMsg ?>
-                        </div>
-                    <?php endif; ?>
+            <!-- Left Col: Forms -->
+            <div class="space-y-8">
 
-                    <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="main-tab" data-bs-toggle="tab" data-bs-target="#main"
-                                type="button" role="tab" aria-controls="main" aria-selected="true"><i
-                                    class="fas fa-user"></i> Мой профиль</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security"
-                                type="button" role="tab" aria-controls="security" aria-selected="false"><i
-                                    class="fas fa-shield-alt"></i> Безопасность</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="favorites-tab" data-bs-toggle="tab" data-bs-target="#favorites"
-                                type="button" role="tab" aria-controls="favorites" aria-selected="false"><i
-                                    class="fas fa-heart"></i> Избранное</button>
-                        </li>
-                    </ul>
+                <!-- Edit Profile Info -->
+                <div class="glass-panel p-8 rounded-3xl">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                        <span class="material-icons text-primary">edit</span> Настройки профиля
+                    </h2>
+                    <form action="profile.php" method="post" id="profileForm">
+                        <?= csrfField() ?>
+                        <input type="file" id="avatarInput" accept="image/*" style="display:none;">
+                        <input type="hidden" name="cropped_image" id="cropped_image">
 
-                    <div class="tab-content" id="profileTabsContent">
-                        <!-- Вкладка Мой профиль -->
-                        <div class="tab-pane fade show active" id="main" role="tabpanel" aria-labelledby="main-tab">
-                            <form action="profile.php" method="post" id="profileForm">
-                                <?= csrfField() ?>
-                                <input type="file" id="avatarInput" accept="image/*" style="display:none;">
-                                <input type="hidden" name="cropped_image" id="cropped_image">
-
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Ваш логин</label>
-                                        <input type="text" name="login" class="form-control"
-                                            value="<?= htmlspecialchars($currentUser['username']) ?>" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Email адрес</label>
-                                        <input type="email" name="email" class="form-control"
-                                            value="<?= htmlspecialchars($currentUser['email']) ?>" required>
-                                    </div>
-                                    <div class="col-12 mb-3">
-                                        <label class="form-label">О себе (биография)</label>
-                                        <textarea name="bio" class="form-control" rows="4"
-                                            placeholder="Напишите немного о себе..."><?= htmlspecialchars($currentUser['bio'] ?? '') ?></textarea>
-                                    </div>
-                                </div>
-                                <button type="submit" name="update_profile" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Сохранить изменения
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- Вкладка Безопасность -->
-                        <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
-                            <form action="profile.php" method="post">
-                                <?= csrfField() ?>
-                                <div class="row">
-                                    <div class="col-md-12 mb-3">
-                                        <label class="form-label">Текущий пароль</label>
-                                        <div class="input-group">
-                                            <input type="password" name="old_password" id="old_password"
-                                                class="form-control" required
-                                                placeholder="Введите ваш текущий пароль...">
-                                            <button class="btn btn-outline-secondary toggle-password" type="button"
-                                                data-target="#old_password">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Новый пароль</label>
-                                        <div class="input-group">
-                                            <input type="password" name="new_password" id="new_password"
-                                                class="form-control" required placeholder="Минимум 4 символа...">
-                                            <button class="btn btn-outline-secondary toggle-password" type="button"
-                                                data-target="#new_password">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">Подтвердите новый пароль</label>
-                                        <div class="input-group">
-                                            <input type="password" name="new_password_2" id="new_password_2"
-                                                class="form-control" required placeholder="Повторите пароль...">
-                                            <button class="btn btn-outline-secondary toggle-password" type="button"
-                                                data-target="#new_password_2">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button type="submit" name="change_password" class="btn btn-warning">
-                                    <i class="fas fa-key"></i> Обновить пароль
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- Вкладка Избранное -->
-                        <div class="tab-pane fade" id="favorites" role="tabpanel" aria-labelledby="favorites-tab">
-                            <div class="row">
-                                <?php if (count($user_favorites_cars) > 0): ?>
-                                    <?php foreach ($user_favorites_cars as $fav): ?>
-                                        <div class="col-md-6 mb-3">
-                                            <div class="card h-100"
-                                                style="background-color: var(--card-bg); border-color: var(--border-color);">
-                                                <div class="card-body">
-                                                    <h6 class="card-title">
-                                                        <a href="<?= BASE_URL ?>single.php?id=<?= $fav['id'] ?>"
-                                                            class="text-decoration-none" style="color: var(--text-color);">
-                                                            <?= htmlspecialchars($fav['brand_name'] . ' ' . $fav['title']) ?>
-                                                        </a>
-                                                    </h6>
-                                                    <p class="card-text text-muted mb-2">
-                                                        <?= number_format($fav['price'], 0, '', ' ') ?>
-                                                        ₽</p>
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <a href="<?= BASE_URL ?>single.php?id=<?= $fav['id'] ?>"
-                                                            class="btn btn-sm btn-outline-primary">Посмотреть авто</a>
-                                                        <button class="fav-btn" data-id="<?= $fav['id'] ?>"
-                                                            style="background:none; border:none; color:#ff4757; font-size:1.2rem;"
-                                                            title="Убрать из избранного"><i class="fas fa-heart"></i></button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <div class="col-12">
-                                        <p class="text-muted">Вы пока ничего не добавили в закладки.</p>
-                                        <a href="<?= BASE_URL ?>" class="btn btn-outline-primary mt-2">Перейти в каталог</a>
-                                    </div>
-                                <?php endif; ?>
+                        <div class="space-y-4">
+                            <div>
+                                <label
+                                    class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 block">Логин</label>
+                                <input type="text" name="login" class="form-control"
+                                    value="<?= htmlspecialchars($currentUser['username']) ?>" required>
                             </div>
+                            <div>
+                                <label
+                                    class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 block">Email</label>
+                                <input type="email" name="email" class="form-control"
+                                    value="<?= htmlspecialchars($currentUser['email']) ?>" required>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 block">О
+                                    себе</label>
+                                <textarea name="bio" class="form-control"
+                                    rows="3"><?= htmlspecialchars($currentUser['bio'] ?? '') ?></textarea>
+                            </div>
+                            <button type="submit" name="update_profile"
+                                class="w-full py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 glow-red transition-all mt-2">
+                                Сохранить изменения
+                            </button>
                         </div>
-                    </div>
+                    </form>
+                </div>
 
+                <!-- Edit Password -->
+                <div class="glass-panel p-8 rounded-3xl">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                        <span class="material-icons text-slate-400">shield</span> Безопасность
+                    </h2>
+                    <form action="profile.php" method="post">
+                        <?= csrfField() ?>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 block">Текущий
+                                    пароль</label>
+                                <input type="password" name="old_password" class="form-control" required>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 block">Новый
+                                    пароль</label>
+                                <input type="password" name="new_password" class="form-control" required>
+                            </div>
+                            <div>
+                                <label
+                                    class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 block">Повторите
+                                    пароль</label>
+                                <input type="password" name="new_password_2" class="form-control" required>
+                            </div>
+                            <button type="submit" name="change_password"
+                                class="w-full py-3 bg-slate-800 dark:bg-white/10 text-white font-bold rounded-xl hover:bg-slate-700 dark:hover:bg-white/20 transition-all mt-2 border border-slate-700 dark:border-white/10">
+                                Обновить пароль
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
-        </div>
-    </div>
+            <!-- Right Col: Favorites 3D Stack -->
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-3xl font-bold tracking-tight">Ваше Избранное</h2>
+                    <a href="<?= BASE_URL ?>favorites.php" class="text-primary text-sm font-bold flex items-center gap-1 hover:underline"
+                        style="text-decoration:none;">Каталог <span class="material-icons text-sm">arrow_forward</span></a>
+                </div>
+                <p class="text-slate-500 dark:text-slate-400 text-lg leading-relaxed mb-8">
+                    Персональная подборка лучших автомобилей из Китая.
+                </p>
 
-    <!-- Модальное окно для обрезки -->
+                <?php if (count($user_favorites_cars) > 0): ?>
+                    <!-- Stacked Cards for Desktop (first 3 cars) -->
+                    <div
+                        class="relative h-[450px] w-full flex items-center justify-center card-stack group cursor-pointer mb-8 hidden md:flex" onclick="window.location.href='<?= BASE_URL ?>favorites.php'">
+                        <?php
+                        // Reverse slice to put the 1st one on top (z-index wise)
+                        $stackCars = array_slice($user_favorites_cars, 0, 3);
+                        $count = count($stackCars);
+                        ?>
+
+                        <?php if ($count >= 3):
+                            $car = $stackCars[2]; ?>
+                            <!-- Card 3 (Bottom) -->
+                            <div
+                                class="absolute w-[340px] h-[400px] rounded-2xl glass-panel shadow-2xl transition-all duration-700 ease-out border-white/20 card-3 rotate-[2deg] translate-x-4 overflow-hidden">
+                                <div class="h-3/5 w-full bg-cover bg-center rounded-t-2xl"
+                                    style="background-image: url('<?= BASE_URL ?>assets/images/cars/<?= $car['img'] ?>')"></div>
+                                <div class="p-6">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs text-primary font-black uppercase tracking-widest">
+                                            <?= htmlspecialchars($car['brand_name']) ?>
+                                        </span>
+                                        <span class="text-sm font-bold text-slate-900 dark:text-slate-100">
+                                            <?= number_format($car['price'], 0, '', ' ') ?> ₽
+                                        </span>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">
+                                        <?= htmlspecialchars($car['title']) ?>
+                                    </h3>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2">
+                                        <?= strip_tags($car['description'] ?? 'Премиальный автомобиль.') ?>
+                                    </p>
+                                </div>
+                                <a href="<?= BASE_URL ?>single.php?id=<?= $car['id'] ?>" class="absolute inset-0 z-10"></a>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($count >= 2):
+                            $car = $stackCars[1]; ?>
+                            <!-- Card 2 (Middle) -->
+                            <div
+                                class="absolute w-[340px] h-[400px] rounded-2xl glass-panel shadow-2xl transition-all duration-700 ease-out border-white/20 card-2 -rotate-[1deg] overflow-hidden">
+                                <div class="h-3/5 w-full bg-cover bg-center rounded-t-2xl"
+                                    style="background-image: url('<?= BASE_URL ?>assets/images/cars/<?= $car['img'] ?>')"></div>
+                                <div class="p-6">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs text-primary font-black uppercase tracking-widest">
+                                            <?= htmlspecialchars($car['brand_name']) ?>
+                                        </span>
+                                        <span class="text-sm font-bold text-slate-900 dark:text-slate-100">
+                                            <?= number_format($car['price'], 0, '', ' ') ?> ₽
+                                        </span>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">
+                                        <?= htmlspecialchars($car['title']) ?>
+                                    </h3>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2">
+                                        <?= strip_tags($car['description'] ?? 'Премиальный автомобиль.') ?>
+                                    </p>
+                                </div>
+                                <a href="<?= BASE_URL ?>single.php?id=<?= $car['id'] ?>" class="absolute inset-0 z-20"></a>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($count >= 1):
+                            $car = $stackCars[0]; ?>
+                            <!-- Card 1 (Top) -->
+                            <div
+                                class="absolute w-[340px] h-[400px] rounded-2xl glass-panel shadow-2xl transition-all duration-700 ease-out border-primary/40 card-1 -rotate-[4deg] -translate-x-4 z-30 overflow-hidden">
+                                <div class="h-3/5 w-full bg-cover bg-center rounded-t-2xl"
+                                    style="background-image: url('<?= BASE_URL ?>assets/images/cars/<?= $car['img'] ?>')"></div>
+                                <div class="p-6">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs text-primary font-black uppercase tracking-widest">
+                                            <?= htmlspecialchars($car['brand_name']) ?>
+                                        </span>
+                                        <span class="text-sm font-bold text-slate-900 dark:text-slate-100">
+                                            <?= number_format($car['price'], 0, '', ' ') ?> ₽
+                                        </span>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-slate-900 dark:text-white">
+                                        <?= htmlspecialchars($car['title']) ?>
+                                    </h3>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2">
+                                        <?= strip_tags($car['description'] ?? 'Премиальный автомобиль.') ?>
+                                    </p>
+                                </div>
+                                <a href="<?= BASE_URL ?>single.php?id=<?= $car['id'] ?>" class="absolute inset-0 z-30"></a>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Button to view all saved cars -->
+                    <div class="text-center">
+                        <a href="<?= BASE_URL ?>favorites.php" class="magnetic-btn inline-flex items-center justify-center gap-2 w-full md:w-auto py-3 px-8 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg shadow-primary/20 transition-all border-none" style="text-decoration:none;">
+                            Все автомобили в каталоге (<?= count($user_favorites_cars) ?>)
+                        </a>
+                    </div>
+                <?php else: ?>
+                    <div
+                        class="glass-panel p-12 rounded-3xl text-center border-dashed border-2 border-slate-300 dark:border-white/10">
+                        <span
+                            class="material-icons text-6xl text-slate-300 dark:text-slate-700 mb-4 block">heart_broken</span>
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Пусто</h3>
+                        <p class="text-slate-500 dark:text-slate-400 mb-6">Вы пока ничего не добавили в избранное.</p>
+                        <a href="<?= BASE_URL ?>"
+                            class="inline-block py-3 px-8 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-105 transition-all text-decoration-none">
+                            Искать автомобили
+                        </a>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Modal for Cropper -->
     <div class="modal fade" id="cropModal" data-bs-backdrop="static" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content" style="background-color: var(--card-bg);">
-                <div class="modal-header">
-                    <h5 class="modal-title">Обрезка аватара</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content glass-panel border-white/10" style="background-color: var(--card-bg);">
+                <div class="modal-header border-white/10">
+                    <h5 class="modal-title font-bold text-slate-900 dark:text-white" id="cropModalLabel">Обрезка аватара
+                    </h5>
+                    <button type="button"
+                        class="btn-close <?php echo ($_SESSION['theme'] ?? 'light') === 'dark' ? 'btn-close-white' : '' ?>"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-0">
                     <div class="img-container"
@@ -413,37 +581,23 @@ $userAvatar = !empty($currentUser['avatar']) ? BASE_URL . "assets/images/avatars
                         <img id="imageToCrop" src="" style="max-width: 100%;">
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <button type="button" class="btn btn-primary" id="cropButton">Применить и сохранить</button>
+                <div class="modal-footer border-white/10">
+                    <button type="button" class="btn btn-secondary text-white bg-slate-600 border-none"
+                        data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary bg-primary border-none glow-red"
+                        id="cropButton">Применить и сохранить</button>
                 </div>
             </div>
         </div>
     </div>
 
     <?php include("app/include/footer.php"); ?>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Сохранение активной вкладки после перезагрузки
-            const tabs = document.querySelectorAll('button[data-bs-toggle="tab"]');
-            tabs.forEach(tab => {
-                tab.addEventListener('shown.bs.tab', function (e) {
-                    localStorage.setItem('activeProfileTab', e.target.id);
-                });
-            });
-
-            const activeTab = localStorage.getItem('activeProfileTab');
-            if (activeTab) {
-                const tabBtn = document.getElementById(activeTab);
-                if (tabBtn) {
-                    const bsTab = new bootstrap.Tab(tabBtn);
-                    bsTab.show();
-                }
-            }
-
-            // Логика Cropper.js для аватара
+            // Cropper.js logic
             let cropper;
             const avatarInput = document.getElementById('avatarInput');
             const imageToCrop = document.getElementById('imageToCrop');
@@ -462,7 +616,6 @@ $userAvatar = !empty($currentUser['avatar']) ? BASE_URL . "assets/images/avatars
                             cropModalObj.show();
                         };
                         reader.readAsDataURL(file);
-                        // очищаем input
                         avatarInput.value = '';
                     }
                 });
@@ -472,7 +625,7 @@ $userAvatar = !empty($currentUser['avatar']) ? BASE_URL . "assets/images/avatars
             if (cropModalEl) {
                 cropModalEl.addEventListener('shown.bs.modal', function () {
                     cropper = new Cropper(imageToCrop, {
-                        aspectRatio: 1, // Аватар квадратный
+                        aspectRatio: 1,
                         viewMode: 1,
                         autoCropArea: 1,
                         responsive: true
@@ -501,17 +654,18 @@ $userAvatar = !empty($currentUser['avatar']) ? BASE_URL . "assets/images/avatars
                             const base64data = reader.result;
                             document.getElementById('cropped_image').value = base64data;
 
-                            // Показываем предпросмотр сразу
                             avatarPreview.src = base64data;
                             avatarPreview.style.display = 'block';
                             if (avatarIcon) avatarIcon.style.display = 'none';
 
                             cropModalObj.hide();
 
-                            // Автоматически отправляем форму профиля
-                            document.querySelector('button[name="update_profile"]').innerHTML = '<i class="fas fa-save"></i> Сохранить (с новым аватаром)';
-                            document.querySelector('button[name="update_profile"]').classList.add('btn-warning');
-                            document.querySelector('button[name="update_profile"]').classList.remove('btn-primary');
+                            const submitBtn = document.querySelector('button[name="update_profile"]');
+                            if (submitBtn) {
+                                submitBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Сохранить (с новым аватаром)';
+                                submitBtn.classList.remove('bg-primary');
+                                submitBtn.classList.add('bg-yellow-500', 'text-slate-900', 'hover:bg-yellow-400', 'glow-red', 'shadow-yellow-500/50');
+                            }
                         }
                         reader.readAsDataURL(blob);
                     }, 'image/webp', 0.8);

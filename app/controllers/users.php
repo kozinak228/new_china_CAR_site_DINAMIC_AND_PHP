@@ -244,15 +244,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update-user'])) {
         } elseif ($passF !== $passS) {
             array_push($errMsg, "РџР°СЂРѕР»Рё РІ РѕР±РµРёС… РїРѕР»СЏС… РґРѕР»Р¶РЅС‹ СЃРѕРѕС‚РІРµС‚СЃС‚РІРѕРІР°С‚СЊ!");
         } else {
-            $pass = password_hash($passF, PASSWORD_DEFAULT);
-            if (isset($_POST['admin']))
-                $admin = 1;
             $user = [
                 'admin' => $admin,
                 'username' => $login,
-                //            'email' => $mail,
-                'password' => $pass
+                // 'email' => $mail,
             ];
+
+            // Обновляем пароль только если введено новое значение
+            if (!empty($passF)) {
+                $user['password'] = password_hash($passF, PASSWORD_DEFAULT);
+            }
 
             update('users', $id, $user);
             header('location: ' . BASE_URL . 'admin/users/index.php');
