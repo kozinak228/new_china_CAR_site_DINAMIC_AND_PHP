@@ -6,7 +6,7 @@ $allCars = selectAll('cars', ['status' => 1]);
 $brands = selectAll('brands');
 ?>
 <!doctype html>
-<html lang="ru" class="<?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark' : '' ?>">
+<html lang="ru" class="<?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'dark' : '' ?>">
 
 <head>
     <meta charset="utf-8">
@@ -106,7 +106,7 @@ $brands = selectAll('brands');
     </style>
 </head>
 
-<body class="<?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark-theme' : '' ?>">
+<body class="<?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'dark-theme' : '' ?>">
 
     <?php include("app/include/header.php"); ?>
 

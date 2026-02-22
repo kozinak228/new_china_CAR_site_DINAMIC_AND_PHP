@@ -23,7 +23,7 @@ if (isset($_SESSION['id'])) {
 include_once SITE_ROOT . "/app/controllers/commentaries.php";
 ?>
 <!doctype html>
-<html lang="ru" class="<?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark' : '' ?>">
+<html lang="ru" class="<?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'dark' : '' ?>">
 
 <head>
     <meta charset="utf-8">
@@ -65,10 +65,12 @@ include_once SITE_ROOT . "/app/controllers/commentaries.php";
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 </head>
 
 <body
-    class="font-display bg-background-light dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-300 <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark-theme' : '' ?>">
+    class="font-display bg-background-light dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-300 <?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'dark-theme' : '' ?>">
 
     <?php include("app/include/header.php"); ?>
 
@@ -94,16 +96,45 @@ include_once SITE_ROOT . "/app/controllers/commentaries.php";
 
                 <div class="relative group rounded-3xl overflow-hidden shadow-2xl glass dark:bg-slate-800/40 border border-slate-200 dark:border-white/10 animate-fade-in-up"
                     style="animation-delay: 0.1s;">
-                    <?php if ($car['img']): ?>
-                        <img alt="<?= htmlspecialchars($car['title']) ?>"
-                            class="w-full h-[400px] md:h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
-                            src="<?= BASE_URL . 'assets/images/cars/' . $car['img'] ?>" />
-                    <?php else: ?>
-                        <div
-                            class="w-full h-[400px] md:h-[500px] bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
-                            <i class="fas fa-car fa-10x text-slate-400"></i>
+
+                    <!-- Swiper Main Container -->
+                    <div class="swiper carSwiper w-full h-[400px] md:h-[500px]">
+                        <div class="swiper-wrapper">
+                            <!-- Main Image Slide -->
+                            <div class="swiper-slide">
+                                <?php if ($car['img']): ?>
+                                    <img alt="<?= htmlspecialchars($car['title']) ?>" class="w-full h-full object-cover"
+                                        src="<?= BASE_URL . 'assets/images/cars/' . $car['img'] ?>" />
+                                <?php else: ?>
+                                    <div
+                                        class="w-full h-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
+                                        <i class="fas fa-car fa-10x text-slate-400"></i>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- Additional Gallery Images Slides -->
+                            <?php if (!empty($carImages)): ?>
+                                <?php foreach ($carImages as $image): ?>
+                                    <div class="swiper-slide">
+                                        <img src="<?= BASE_URL . 'assets/images/cars/' . $image['img'] ?>" alt="Фото авто"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </div>
-                    <?php endif; ?>
+
+                        <!-- Add Navigation -->
+                        <div
+                            class="swiper-button-next !text-white drop-shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                        </div>
+                        <div
+                            class="swiper-button-prev !text-white drop-shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
+                        </div>
+
+                        <!-- Add Pagination -->
+                        <div class="swiper-pagination"></div>
+                    </div>
 
                     <div
                         class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none">
@@ -130,23 +161,7 @@ include_once SITE_ROOT . "/app/controllers/commentaries.php";
                     </button>
                 </div>
 
-                <!-- Галерея -->
-                <?php if (count($carImages) > 0): ?>
-                    <section class="space-y-4 animate-fade-in-up" style="animation-delay: 0.15s;">
-                        <h2 class="text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
-                            <span class="w-8 h-1 bg-primary rounded-full"></span> Фотогалерея
-                        </h2>
-                        <div class="flex gap-4 overflow-x-auto pb-4 custom-scrollbar">
-                            <?php foreach ($carImages as $image): ?>
-                                <a href="<?= BASE_URL . 'assets/images/cars/' . $image['img'] ?>" target="_blank"
-                                    class="flex-none w-40 h-32 rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-700">
-                                    <img src="<?= BASE_URL . 'assets/images/cars/' . $image['img'] ?>" alt="Фото авто"
-                                        class="w-full h-full object-cover hover:scale-110 transition-transform duration-300">
-                                </a>
-                            <?php endforeach; ?>
-                        </div>
-                    </section>
-                <?php endif; ?>
+                <!-- Галерея была удалена, так как фото теперь в слайдере -->
 
                 <section class="space-y-6 pt-4 animate-fade-in-up" style="animation-delay: 0.2s;">
                     <h2 class="text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
@@ -300,8 +315,26 @@ include_once SITE_ROOT . "/app/controllers/commentaries.php";
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
         crossorigin="anonymous"></script>
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Swiper
+            const swiper = new Swiper(".carSwiper", {
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                },
+                pagination: {
+                    el: ".swiper-pagination",
+                    clickable: true,
+                },
+                keyboard: {
+                    enabled: true,
+                },
+                loop: true,
+            });
+
             document.querySelectorAll('.compare-btn').forEach(btn => {
                 btn.addEventListener('click', function (e) {
                     e.preventDefault();

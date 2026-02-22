@@ -90,5 +90,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_comment'])) {
     }
 }
 
-// Для admin-панели: все комментарии
-$commentsForAdm = selectAll('comments');
+// Для admin-панели: все комментарии с пагинацией
+$pageCmd = isset($_GET['page']) ? intval($_GET['page']) : 1;
+if ($pageCmd < 1)
+    $pageCmd = 1;
+$perPageCmd = 30;
+$offsetCmd = ($pageCmd - 1) * $perPageCmd;
+
+$totalCommentsAdm = countRow('comments');
+$totalPagesCmd = ceil($totalCommentsAdm / $perPageCmd);
+
+global $pdo;
+$sql = "SELECT * FROM comments ORDER BY id DESC LIMIT $perPageCmd OFFSET $offsetCmd";
+$query = $pdo->prepare($sql);
+$query->execute();
+$commentsForAdm = $query->fetchAll();

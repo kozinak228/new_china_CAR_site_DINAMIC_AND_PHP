@@ -1,0 +1,37 @@
+const fs = require('fs');
+const path = require('path');
+
+function walk(dir) {
+    let results = [];
+    const list = fs.readdirSync(dir);
+    list.forEach(file => {
+        file = path.resolve(dir, file);
+        const stat = fs.statSync(file);
+        if (stat && stat.isDirectory()) {
+            if (!file.includes('invoice-landing') && !file.includes('.git') && !file.includes('node_modules')) {
+                results = results.concat(walk(file));
+            }
+        } else {
+            if (file.endsWith('.php')) {
+                results.push(file);
+            }
+        }
+    });
+    return results;
+}
+
+const files = walk('.');
+let updatedCount = 0;
+
+files.forEach(file => {
+    let content = fs.readFileSync(file, 'utf8');
+    if (content.includes(`$_SESSION['theme'] ?? 'light'`)) {
+        // Replace all occurrences
+        content = content.replace(/\$_SESSION\['theme'\] \?\? 'light'/g, `$_SESSION['theme'] ?? 'dark'`);
+        fs.writeFileSync(file, content);
+        console.log('Updated ' + file);
+        updatedCount++;
+    }
+});
+
+console.log(`Updated ${updatedCount} files.`);

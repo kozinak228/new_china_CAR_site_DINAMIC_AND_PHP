@@ -37,7 +37,7 @@ if (isset($_SESSION['id'])) {
 }
 ?>
 <!doctype html>
-<html lang="ru" class="<?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark' : '' ?>">
+<html lang="ru" class="<?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'dark' : '' ?>">
 
 <head>
     <meta charset="utf-8">
@@ -82,7 +82,7 @@ if (isset($_SESSION['id'])) {
 </head>
 
 <body
-    class="bg-slate-50 dark:bg-background-dark text-slate-900 dark:text-slate-100 <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark-theme' : '' ?>">
+    class="bg-slate-50 dark:bg-background-dark text-slate-900 dark:text-slate-100 <?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'dark-theme' : '' ?>">
 
     <?php include("app/include/header.php"); ?>
 
@@ -151,7 +151,7 @@ if (isset($_SESSION['id'])) {
                     <div class="border-b border-slate-200 dark:border-white/10 pb-4">
                         <label
                             class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2 block">Бренд</label>
-                        <select name="brand" <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'style="color-scheme: dark;"' : '' ?>
+                        <select name="brand" <?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'style="color-scheme: dark;"' : '' ?>
                             class="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-lg p-3 text-sm focus:ring-primary transition-all text-slate-800 dark:text-white outline-none">
                             <option value="">Все бренды</option>
                             <?php foreach ($brands as $b): ?>
@@ -166,7 +166,7 @@ if (isset($_SESSION['id'])) {
                         <label
                             class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-2 block">Тип
                             кузова</label>
-                        <select name="body_type" <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'style="color-scheme: dark;"' : '' ?>
+                        <select name="body_type" <?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'style="color-scheme: dark;"' : '' ?>
                             class="w-full bg-slate-100 dark:bg-slate-900 border-none rounded-lg p-3 text-sm focus:ring-primary transition-all text-slate-800 dark:text-white outline-none">
                             <option value="">Все</option>
                             <?php foreach ($bodyTypes as $bt): ?>

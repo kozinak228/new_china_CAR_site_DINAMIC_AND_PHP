@@ -4,7 +4,7 @@ include("app/database/db.php");
 include "path.php";
 ?>
 <!DOCTYPE html>
-<html lang="ru" <?= isset($_SESSION['theme']) && $_SESSION['theme'] === 'dark' ? 'class="dark"' : '' ?>>
+<html lang="ru" class="<?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'dark' : '' ?>">
 
 <head>
     <meta charset="utf-8">
@@ -43,7 +43,7 @@ include "path.php";
 </head>
 
 <body
-    class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 transition-colors duration-300 min-h-screen flex flex-col <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark-theme' : '' ?>">
+    class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 transition-colors duration-300 min-h-screen flex flex-col <?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'dark-theme' : '' ?>">
 
     <!-- Header -->
     <?php include("app/include/header.php"); ?>

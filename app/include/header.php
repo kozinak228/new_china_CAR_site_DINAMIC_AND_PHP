@@ -28,17 +28,17 @@
                     style="display:none; z-index:100;"></div>
             </div>
 
-            <div class="relative group">
+            <div class="relative group py-4">
                 <a href="<?= isset($_SESSION['id']) ? BASE_URL . 'profile.php' : BASE_URL . 'log.php' ?>"
-                    class="flex items-center h-full material-icons px-2 hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-slate-700 dark:text-white border-none bg-transparent focus:outline-none"
-                    style="text-decoration:none; min-height: 80px;">
+                    class="flex items-center justify-center p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-slate-700 dark:text-white border-none bg-transparent focus:outline-none material-icons"
+                    style="text-decoration:none;">
                     person_outline
                 </a>
                 <!-- Dropdown menu -->
                 <div
-                    class="absolute right-0 top-full pt-0 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50">
+                    class="absolute right-0 top-[100%] mt-[-10px] pt-4 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-right z-50">
                     <div
-                        class="bg-[#fff] dark:bg-slate-800 rounded-lg shadow-xl py-1 border border-slate-200 dark:border-slate-700 overflow-hidden mt-[-10px]">
+                        class="bg-[#fff] dark:bg-slate-800 rounded-lg shadow-xl py-1 border border-slate-200 dark:border-slate-700 overflow-hidden">
                         <?php if (isset($_SESSION['id'])): ?>
                             <div
                                 class="px-4 py-2 border-b border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-800 dark:text-white">

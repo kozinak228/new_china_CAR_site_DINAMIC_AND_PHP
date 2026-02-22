@@ -4,7 +4,7 @@ require_once("app/database/db.php");
 require "path.php";
 ?>
 <!DOCTYPE html>
-<html lang="ru" <?= isset($_SESSION['theme']) && $_SESSION['theme'] === 'dark' ? 'class="dark"' : '' ?>>
+<html lang="ru" class="<?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'dark' : '' ?>">
 
 <head>
     <meta charset="utf-8">
@@ -54,15 +54,6 @@ require "path.php";
             position: sticky;
             left: 0;
             z-index: 10;
-            background: inherit;
-        }
-
-        .dark .spec-label-col {
-            background-color: #1e293b;
-        }
-
-        .spec-label-col:not(.dark) {
-            background-color: #ffffff;
         }
 
         @keyframes fadeIn {
@@ -197,7 +188,7 @@ require "path.php";
                         ];
 
                         foreach ($specs as $rowIndex => $spec):
-                            $bgClass = $rowIndex % 2 === 0 ? 'bg-transparent' : 'bg-slate-50 dark:bg-slate-800/50';
+                            $bgClass = $rowIndex % 2 === 0 ? 'bg-white dark:bg-slate-900' : 'bg-slate-50 dark:bg-slate-800';
                             ?>
                             <!-- Spec Label -->
                             <div

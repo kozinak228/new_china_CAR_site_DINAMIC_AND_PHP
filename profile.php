@@ -16,7 +16,7 @@ $currentUser = selectOne('users', ['id' => $_SESSION['id']]);
 
 // Переключение темы
 if (isset($_POST['toggle_theme'])) {
-    $newTheme = ($_SESSION['theme'] ?? 'light') === 'dark' ? 'light' : 'dark';
+    $newTheme = ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'light' : 'dark';
     $_SESSION['theme'] = $newTheme;
     header('location: ' . BASE_URL . 'profile.php');
     exit;
@@ -125,7 +125,7 @@ $user_favorites_cars = $stmt_fav->fetchAll();
 $userAvatar = !empty($currentUser['avatar']) ? BASE_URL . "assets/images/avatars/" . $currentUser['avatar'] : '';
 ?>
 <!doctype html>
-<html lang="ru" class="<?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark' : '' ?>">
+<html lang="ru" class="<?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'dark' : '' ?>">
 
 <head>
     <meta charset="utf-8">
@@ -238,7 +238,7 @@ $userAvatar = !empty($currentUser['avatar']) ? BASE_URL . "assets/images/avatars
 </head>
 
 <body
-    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark-theme' : '' ?>">
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen font-display <?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'dark-theme' : '' ?>">
 
     <?php include("app/include/header.php"); ?>
 
@@ -316,8 +316,8 @@ $userAvatar = !empty($currentUser['avatar']) ? BASE_URL . "assets/images/avatars
                             <button type="submit" name="toggle_theme"
                                 class="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm font-medium border border-slate-300 dark:border-white/10 transition-colors flex items-center gap-2">
                                 <i
-                                    class="fas <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'fa-sun' : 'fa-moon' ?>"></i>
-                                <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'Светлая тема' : 'Темная тема' ?>
+                                    class="fas <?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'fa-sun' : 'fa-moon' ?>"></i>
+                                <?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'Светлая тема' : 'Темная тема' ?>
                             </button>
                         </form>
                         <?php if ($currentUser['admin']): ?>
@@ -572,7 +572,7 @@ $userAvatar = !empty($currentUser['avatar']) ? BASE_URL . "assets/images/avatars
                     <h5 class="modal-title font-bold text-slate-900 dark:text-white" id="cropModalLabel">Обрезка аватара
                     </h5>
                     <button type="button"
-                        class="btn-close <?php echo ($_SESSION['theme'] ?? 'light') === 'dark' ? 'btn-close-white' : '' ?>"
+                        class="btn-close <?php echo ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'btn-close-white' : '' ?>"
                         data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-0">

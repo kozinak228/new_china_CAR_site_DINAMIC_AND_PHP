@@ -1,7 +1,7 @@
 <?php include("path.php");
 include "app/controllers/users.php";
 ?>
-<html lang="ru" class="<?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark' : '' ?>">
+<html lang="ru" class="<?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'dark' : '' ?>">
 
 <head>
     <!-- Required meta tags -->
@@ -95,13 +95,13 @@ include "app/controllers/users.php";
 </head>
 
 <body
-    class="bg-slate-50 dark:bg-background-dark text-slate-900 dark:text-slate-100 <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'dark-theme' : '' ?>">
+    class="bg-slate-50 dark:bg-background-dark text-slate-900 dark:text-slate-100 <?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'dark-theme' : '' ?>">
 
     <?php include("app/include/header.php"); ?>
 
     <!-- Background Decoration -->
     <div
-        class="fixed inset-0 z-0 bg-animated-gradient <?= ($_SESSION['theme'] ?? 'light') === 'dark' ? 'theme-dark-gradient' : 'theme-light-gradient' ?>">
+        class="fixed inset-0 z-0 bg-animated-gradient <?= ($_SESSION['theme'] ?? 'dark') === 'dark' ? 'theme-dark-gradient' : 'theme-light-gradient' ?>">
     </div>
 
     <!-- START FORM -->
