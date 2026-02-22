@@ -652,16 +652,7 @@ COMMENTS
     box-shadow: 0 2px 8px rgba(233, 69, 96, 0.1);
 }
 
-.all-comments .one-comment i {
-    margin: 0.3rem 0.6rem 0 0;
-    font-weight: 600;
-}
-
-.all-comments .one-comment span {
-    display: inline-flex;
-    margin: 0.5rem 1.5rem 1.5rem 0;
-    font-weight: 500;
-}
+/* Legacy comment styles removed to avoid breaking Tailwind flex containers */
 
 /* Pagination */
 .pagination .page-link {
@@ -1079,4 +1070,178 @@ body.dark-theme .search-result-title {
 
 body.dark-theme .search-result-meta {
     color: #aaa;
+}
+
+/*
+=============================
+   STITCH PREMIUM DESIGN
+=============================
+*/
+.glass {
+    background: rgba(255, 255, 255, 0.75) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1) !important;
+}
+
+.dark .glass,
+.dark-theme .glass {
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(25px) !important;
+    -webkit-backdrop-filter: blur(25px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4) !important;
+}
+
+
+
+.glass-light {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tilt-card {
+    transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+    transform-style: preserve-3d;
+}
+
+.tilt-card:hover {
+    transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.spec-fade {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s ease;
+}
+
+.tilt-card:hover .spec-fade {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.magnetic-btn {
+    transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.magnetic-btn:hover {
+    transform: scale(1.05);
+}
+
+.hero-gradient {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0) 0%, rgba(15, 23, 42, 0.9) 100%);
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #e11d48;
+}
+
+/*
+=============================
+   FEATURE & UI FIXES (Turn 5)
+=============================
+*/
+
+/* 2. Neon Select Arrows in Dark Theme */
+.dark select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
+}
+
+/* 4. Global Subtle Animated Two-Tone Gradient */
+body {
+    background: linear-gradient(135deg, #00d2ff 0%, #ffffff 50%, #00d2ff 100%) !important;
+    background-size: 400% 400%;
+    animation: flowGradient 15s ease-in-out infinite alternate;
+}
+
+@keyframes flowGradient {
+    0% {
+        background-position: 0% 0%;
+    }
+
+    100% {
+        background-position: 100% 100%;
+    }
+}
+
+body.dark-theme {
+    background: linear-gradient(-45deg, #0f172a, #1e293b, #0f172a, #020617) !important;
+    background-size: 400% 400%;
+    animation: globalGradientBG 15s ease infinite;
+}
+
+@keyframes globalGradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* 5. Single Car Page Custom Stitch Styles */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.spec-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.glass-morphism,
+.glass {
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+
+body.dark-theme .glass-morphism,
+body.dark-theme .glass {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
 }
