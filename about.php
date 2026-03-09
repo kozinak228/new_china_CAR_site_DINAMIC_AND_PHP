@@ -45,6 +45,7 @@ include "path.php";
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css">
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Custom Global CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
@@ -115,7 +116,7 @@ include "path.php";
 
         <!-- Our Mission Section -->
         <section class="container mx-auto px-4 py-16">
-            <div class="max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-3xl p-8 md:p-12 shadow-sm border border-slate-200 dark:border-slate-700 animate-fade-in-up"
+            <div class="max-w-4xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-3xl p-8 md:p-12 shadow-sm border border-slate-200 dark:border-white/10 animate-fade-in-up"
                 style="animation-delay: 0.2s;">
                 <h2 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-8 text-center">Наша
                     философия</h2>
