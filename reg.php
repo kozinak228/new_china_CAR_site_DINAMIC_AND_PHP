@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 include "path.php";
 include "app/controllers/users.php";
 ?>
@@ -37,49 +37,7 @@ include "app/controllers/users.php";
     </script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
-    <style>
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
 
-        /* Animated Gradient Background */
-        .bg-animated-gradient {
-            background-size: 300% 300%;
-            animation: gradientBG 15s ease infinite;
-        }
-
-        /* Light Theme: Yellow to White */
-        .theme-light-gradient {
-            background: linear-gradient(135deg, #fef08a, #ffffff, #fde047, #ffffff);
-        }
-
-        /* Dark Theme: Yellow to Dark Blue */
-        .theme-dark-gradient {
-            background: linear-gradient(135deg, #eab308, #1e3a8a, #0f172a, #1e40af);
-        }
-
-        @keyframes gradientBG {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        input:focus {
-            box-shadow: 0 0 15px rgba(225, 29, 72, 0.2);
-        }
-    </style>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
 
