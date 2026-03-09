@@ -3,6 +3,11 @@ include "../../path.php";
 include_once SITE_ROOT . "/app/database/db.php";
 
 session_start();
+if (!isset($_SESSION['id']) || !isset($_SESSION['admin']) || !$_SESSION['admin']) {
+    header('location: /');
+    exit();
+}
+
 if (!isset($_SESSION['id']) || !isset($_SESSION['admin'])) {
     http_response_code(403);
     echo json_encode(['success' => false, 'error' => 'Доступ запрещен']);

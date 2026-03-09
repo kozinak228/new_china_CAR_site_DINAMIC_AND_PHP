@@ -1,4 +1,9 @@
 <?php session_start();
+if (!isset($_SESSION['id']) || !isset($_SESSION['admin']) || !$_SESSION['admin']) {
+    header('location: /');
+    exit();
+}
+
 include "../../path.php";
 include "../../app/controllers/users.php";
 ?>
